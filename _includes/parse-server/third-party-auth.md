@@ -60,6 +60,17 @@ Note, most of them don't require a server configuration so you can use them dire
 }
 ```
 
+With Facebook's iOS SDK 17, you are required to implement Facebook Limited Login. If the user does not allow tracking through Apple's App Tracking Transparency, then the Facebook returns a JWT token instead of an access token. Therefore, in your app you would need to check if tracking is allowed or not and pass the relevant tokens. If your app does not receive an access token, then you will need to pass the below instead. *Available on parse-server v6.5.6 and above and v7.0.1 and above.*
+
+```jsonc
+{
+  "facebook": {
+    "id": "user's Facebook id number as a string",
+    "token": "a JWT token from Facebook SDK limited login",
+  }
+}
+```
+
 The options passed to Parse Server:
 ```js
 {
@@ -69,6 +80,8 @@ The options passed to Parse Server:
     },
   }
 }
+```
+
 ```
 
 Learn more about [Facebook login](https://developers.facebook.com/docs/authentication/).
