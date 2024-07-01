@@ -2,26 +2,26 @@
 
 ## Creating a Parse.File
 
-`Parse.File` lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `Parse.Object`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data (up to 10 megabytes).
+`Parse.File` lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `Parse.Object`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data.
 
 Getting started with `Parse.File` is easy. There are a couple of ways to create a file. The first is with a base64-encoded String.
 
 ```javascript
-var base64 = "V29ya2luZyBhdCBQYXJzZSBpcyBncmVhdCE=";
-var file = new Parse.File("myfile.txt", { base64: base64 });
+const base64 = "V29ya2luZyBhdCBQYXJzZSBpcyBncmVhdCE=";
+const file = new Parse.File("myfile.txt", { base64: base64 });
 ```
 
 Alternatively, you can create a file from an array of byte values:
 
 ```javascript
-var bytes = [ 0xBE, 0xEF, 0xCA, 0xFE ];
-var file = new Parse.File("myfile.txt", bytes);
+const bytes = [ 0xBE, 0xEF, 0xCA, 0xFE ];
+const file = new Parse.File("myfile.txt", bytes);
 ```
 
 Parse will auto-detect the type of file you are uploading based on the file extension, but you can specify the `Content-Type` with a third parameter:
 
 ```javascript
-var file = new Parse.File("myfile.zzz", fileData, "image/png");
+const file = new Parse.File("myfile.zzz", fileData, "image/png");
 ```
 
 ### Client Side
@@ -34,12 +34,12 @@ In a browser, you'll want to use an html form with a file upload control. To do 
 Then, in a click handler or other function, get a reference to that file:
 
 ```javascript
-var fileUploadControl = $("#profilePhotoFileUpload")[0];
+const fileUploadControl = $("#profilePhotoFileUpload")[0];
 if (fileUploadControl.files.length > 0) {
-  var file = fileUploadControl.files[0];
-  var name = "photo.jpg";
+  const file = fileUploadControl.files[0];
+  const name = "photo.jpg";
 
-  var parseFile = new Parse.File(name, file);
+  const parseFile = new Parse.File(name, file);
 }
 ```
 
@@ -88,7 +88,7 @@ request(options)
 Finally, after the save completes, you can associate a `Parse.File` with a `Parse.Object` just like any other piece of data:
 
 ```javascript
-var jobApplication = new Parse.Object("JobApplication");
+const jobApplication = new Parse.Object("JobApplication");
 jobApplication.set("applicantName", "Joe Smith");
 jobApplication.set("applicantResumeFile", parseFile);
 jobApplication.save();
@@ -99,7 +99,7 @@ jobApplication.save();
 How to best retrieve the file contents back depends on the context of your application. Because of cross-domain request issues, it's best if you can make the browser do the work for you. Typically, that means rendering the file's URL into the DOM. Here we render an uploaded profile photo on a page with jQuery:
 
 ```javascript
-var profilePhoto = profile.get("photoFile");
+const profilePhoto = profile.get("photoFile");
 $("profileImg")[0].src = profilePhoto.url();
 ```
 
@@ -111,6 +111,33 @@ Parse.Cloud.httpRequest({ url: profilePhoto.url() }).then(function(response) {
 });
 ```
 
-You can delete files that are referenced by objects using the [REST API]({{ site.baseUrl }}/rest/guide/#deleting-files). You will need to provide the master key in order to be allowed to delete a file.
+## Deleting Files
 
-If your files are not referenced by any object in your app, it is not possible to delete them through the REST API.
+You can delete files that are referenced by objects using the `destroy` method. The master key is required to delete a file.
+
+```javascript
+const profilePhoto = profile.get("photoFile");
+await profilePhoto.destroy({ useMasterKey: true });
+```
+
+#### Parse Server <4.2.0
+
+Use the [REST API]({{ site.baseUrl }}/rest/guide/#deleting-files) to delete a file.
+
+## Adding Metadata and Tags
+
+Adding Metadata and Tags to your files allows you to add additional bits of data to the files that are stored within your storage solution (i.e AWS S3).
+
+Note: not all storage adapters support metadata and tags. Check the documentation for the storage adapter you're using for compatibility.
+
+```javascript
+// Init with metadata and tags
+const metadata = { createdById: 'some-user-id' };
+const tags = { groupId: 'some-group-id' };
+const file = new Parse.File('myfile.zzz', fileData, 'image/png', metadata, tags);
+
+// Add metadata and tags
+const file = new Parse.File('myfile.zzz', fileData, 'image/png');
+file.addMetadata('createdById', 'some-user-id');
+file.addTag('groupId', 'some-group-id');
+```

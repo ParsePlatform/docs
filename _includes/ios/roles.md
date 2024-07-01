@@ -31,7 +31,7 @@ PFRole *role = [PFRole roleWithName:@"Administrator" acl:roleACL];
 ```
 ```swift
 // By specifying no write privileges for the ACL, we can ensure the role cannot be altered.
-var roleACL = PFACL.ACL()
+var roleACL = PFACL()
 roleACL.setPublicReadAccess(true)
 var role = PFRole.roleWithName("Administrator", acl:roleACL)
 role.saveInBackground()
@@ -83,8 +83,8 @@ wallPost.ACL = postACL;
 ```
 ```swift
 var moderators = /* Query for some PFRole */
-var wallPost = PFObject(className:"WallPost")
-var postACL = PFACL.ACL()
+var wallPost = PFObject(className: "WallPost")
+var postACL = PFACL()
 postACL.setWriteAccess(true, forRole:moderators)
 wallPost.ACL = postACL
 wallPost.saveInBackground()
@@ -102,9 +102,9 @@ wallPost.ACL = postACL;
 [wallPost saveInBackground];
 ```
 ```swift
-var wallPost = PFObject(className:"WallPost")
-var postACL = PFACL.ACL()
-postACL.setWriteAccess(true, forRoleWithName:"Moderators")
+var wallPost = PFObject(className: "WallPost")
+var postACL = PFACL()
+postACL.setWriteAccess(true, forRoleWithName: "Moderators")
 wallPost.ACL = postACL
 wallPost.saveInBackground()
 ```
@@ -123,13 +123,13 @@ PFACL *defaultACL = [PFACL ACL];
 [PFACL setDefaultACL:defaultACL withAccessForCurrentUser:YES];
 ```
 ```swift
-var defaultACL = PFACL.ACL()
+var defaultACL = PFACL()
 // Everybody can read objects created by this user
-defaultACL.setPublicReadAccess(true)
+defaultACL.hasPublicWriteAccess = true
 // Moderators can also modify these objects
-defaultACL.setWriteAccess(true, forRoleWithName:"Moderators")
+defaultACL.setWriteAccess(true, forRoleWithName: "Moderators")
 // And the user can read and modify its own objects
-PFACL.setDefaultACL(defaultACL, withAccessForCurrentUser:true)
+PFACL.setDefault(defaultACL, withAccessForCurrentUser:true)
 ```
 </div>
 

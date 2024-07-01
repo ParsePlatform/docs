@@ -88,7 +88,7 @@ Note that this will only send if the account for the email requested has not alr
 
 It would be bothersome if the user had to log in every time they open your app. You can avoid this by using the cached current `ParseUser` object.
 
-By default, whenever you use any signup or login methods, the user will be saved in PHP Session storage (The `$_SESSION` superglobal.)
+By default, whenever you use any signup or login methods, the user will be saved in PHP Session storage, the `$_SESSION` superglobal. When re-initializing the Parse PHP SDK, you may need to instruct PHP to load the stored session data into the `$_SESSION` superglobal using `session_start()` before initializing the Parse PHP SDK to make Parse use persistent storage and continue the previous user session.
 
 ```php
 $currentUser = ParseUser::getCurrentUser();

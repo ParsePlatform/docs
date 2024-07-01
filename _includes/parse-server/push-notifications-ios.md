@@ -13,10 +13,10 @@ application.registerForRemoteNotifications()
 ```objc
 // Objective-C
 UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
-                                                UIUserNotificationTypeBadge |
-                                                UIUserNotificationTypeSound);
+UIUserNotificationTypeBadge |
+UIUserNotificationTypeSound);
 UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
-                                                                         categories:nil];
+categories:nil];
 [application registerUserNotificationSettings:settings];
 [application registerForRemoteNotifications];
 ```
@@ -24,10 +24,10 @@ UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTy
 ```csharp
 // Xamarin
 UIUserNotificationType notificationTypes = (UIUserNotificationType.Alert |
-                                            UIUserNotificationType.Badge |
-                                            UIUserNotificationType.Sound);
+UIUserNotificationType.Badge |
+UIUserNotificationType.Sound);
 var settings = UIUserNotificationSettings.GetSettingsForTypes(notificationTypes,
-                                                              new NSSet(new string[] { }));
+new NSSet(new string[] { }));
 UIApplication.SharedApplication.RegisterUserNotificationSettings(settings);
 UIApplication.SharedApplication.RegisterForRemoteNotifications();
 
@@ -62,38 +62,29 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 
 ```objc
 // Objective-C
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-  // Store the deviceToken in the current installation and save it to Parse.
-  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-  [currentInstallation setDeviceTokenFromData:deviceToken];
-  [currentInstallation saveInBackground];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  [PFPush handlePush:userInfo];
-}
+UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
+                                                UIUserNotificationTypeBadge |
+                                                UIUserNotificationTypeSound);
+UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
+                                                                         categories:nil];
+[application registerUserNotificationSettings:settings];
+[application registerForRemoteNotifications];
 ```
 
 ```csharp
 // Xamarin
-public override void DidRegisterUserNotificationSettings(UIApplication application,
-    UIUserNotificationSettings notificationSettings) {
-  application.RegisterForRemoteNotifications();
-}
+UIUserNotificationType notificationTypes = (UIUserNotificationType.Alert |
+                                            UIUserNotificationType.Badge |
+                                            UIUserNotificationType.Sound);
+var settings = UIUserNotificationSettings.GetSettingsForTypes(notificationTypes,
+                                                              new NSSet(new string[] { }));
+UIApplication.SharedApplication.RegisterUserNotificationSettings(settings);
+UIApplication.SharedApplication.RegisterForRemoteNotifications();
 
-public override void RegisteredForRemoteNotifications(UIApplication application,
-    NSData deviceToken) {
-  ParseInstallation installation = ParseInstallation.CurrentInstallation;
-  installation.SetDeviceTokenFromData(deviceToken);
-
-  installation.SaveAsync();
-}
-
-public override void ReceivedRemoteNotification(UIApplication application,
-    NSDictionary userInfo) {
-  // We need this to fire userInfo into ParsePushNotificationReceived.
-  ParsePush.HandlePush(userInfo);
-}
+// Handle Push Notifications
+ParsePush.ParsePushNotificationReceived += (object sender, ParsePushNotificationEventArgs args) => {
+  // Process Push Notification payload here.
+};
 ```
 
 ##### Compile and run!

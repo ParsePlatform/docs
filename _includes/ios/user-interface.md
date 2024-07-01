@@ -2,11 +2,9 @@
 
 At the end of the day, users of your app are going to be interacting with UIKit components.
 
-[ParseUI](https://github.com/parse-community/ParseUI-iOS) is an opensource collection of a handy user interface components aimed to streamline and simplify user authentication, displaying lists of data, and other common app elements.
+ParseUI is an opensource collection of a handy user interface components aimed to streamline and simplify user authentication, displaying lists of data, and other common app elements.
 
-Please note that [ParseUI](https://github.com/parse-community/ParseUI-iOS) is not included inside the main Parse iOS SDK.
-
-To learn more on how to install it - follow the instructions on the official [GitHub page](https://github.com/parse-community/ParseUI-iOS).
+ParseUI can be installed by leveraging Cocoapods 'subspecs', simply add `pod 'Parse/UI'` to your Podfile and run `pod install`. Once installed just use `import Parse` to use ParseUI. More details can be found on the official [GitHub page](https://github.com/parse-community/Parse-SDK-iOS-OSX#other-installation-options)
 
 ## PFLogInViewController
 
@@ -23,7 +21,7 @@ logInController.delegate = self;
 ```swift
 var logInController = PFLogInViewController()
 logInController.delegate = self
-self.presentViewController(logInController, animated:true, completion: nil)
+self.present(logInController, animated:true, completion: nil)
 ```
 </div>
 
@@ -50,11 +48,11 @@ Any of the above features can be turned on or off. The options can be set using 
                            | PFLogInFieldsDismissButton);
 ```
 ```swift
-  logInController.fields = [PFLogInFields.UsernameAndPassword,
-                            PFLogInFields.LogInButton,
-                            PFLogInFields.SignUpButton,
-                            PFLogInFields.PasswordForgotten,
-                            PFLogInFields.DismissButton]
+logInController.fields = [PFLogInFields.usernameAndPassword,
+                          PFLogInFields.logInButton,
+                          PFLogInFields.signUpButton,
+                          PFLogInFields.passwordForgotten,
+                          PFLogInFields.dismissButton]
 ```
 </div>
 
@@ -74,9 +72,9 @@ logInController.fields = (PFLogInFieldsUsernameAndPassword
                           | PFLogInFieldsTwitter);
 ```
 ```swift
-logInController.fields = [PFLogInFields.UsernameAndPassword,
-                           PFLogInFields.Facebook,
-                           PFLogInFields.Twitter]
+logInController.fields = [PFLogInFields.usernameAndPassword,
+                          PFLogInFields.facebook,
+                          PFLogInFields.twitter]
 ```
 </div>
 
@@ -93,7 +91,7 @@ logInController.facebookPermissions = @[ @"friends_about_me" ];
 var logInController = PFLogInViewController()
 logInController.delegate = self
 logInController.facebookPermissions = [ "friends_about_me" ]
-self.presentViewController(logInController, animated:true, completion:nil)
+self.present(logInController, animated:true, completion:nil)
 ```
 </div>
 
@@ -114,11 +112,11 @@ When the user signs in or cancels, the `PFLogInViewController` notifies the dele
 ```
 ```swift
 func logInViewController(controller: PFLogInViewController, didLogInUser user: PFUser!) -> Void {
-  self.dismissViewControllerAnimated(true, completion: nil)
+	self.dismiss(animated: true, completion: nil)
 }
 
-func logInViewControllerDidCancelLogIn(controller: PFLogInViewController) -> Void {
-  self.dismissViewControllerAnimated(true, completion: nil)
+func logInViewControllerDidCancelLog(in controller: PFLogInViewController) -> Void {
+	self.dismiss(animated: true, completion: nil)
 }
 ```
 </div>
@@ -148,15 +146,15 @@ You might want to use your own logo or background image. You can achieve this by
 @end
 ```
 ```swift
-class MyLogInViewController : PFLogInViewController {
+class MyLogInViewController: PFLogInViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.view.backgroundColor = UIColor.darkGrayColor()
+    self.view.backgroundColor = .darkGray
 
-    let logoView = UIImageView(image: UIImage(named:"logo.png"))
-    self.logInView.logo = logoView
+		let logoView = UIImageView(image: UIImage(named:"logo.png"))
+		self.logInView?.logo = logoView
   }
 
 }
@@ -174,7 +172,7 @@ logInController.signUpController = [[MySignUpViewController alloc] init];
 ```swift
 let logInController = MyLogInViewController()
 logInController.signUpController = MySignUpViewController()
-self.presentViewController(logInController, animated: true, completion: nil)
+self.present(logInController, animated: true, completion: nil)
 ```
 </div>
 
@@ -246,7 +244,7 @@ signUpController.delegate = self;
 ```swift
 let signUpController = PFSignUpViewController()
 signUpController.delegate = self
-self.presentViewController(signUpController, animated: true, completion: nil)
+self.present(signUpController, animated: true, completion: nil)
 ```
 </div>
 
@@ -274,15 +272,11 @@ signUpController.fields = (PFSignUpFieldsUsernameAndPassword
                           | PFSignUpFieldsDismissButton);
 ```
 ```swift
-signUpController.fields = (PFSignUpFields.UsernameAndPassword
-                          | PFSignUpFields.SignUpButton
-                          | PFSignUpFields.Email
-                          | PFSignUpFields.Additional
-                          | PFSignUpFields.DismissButton)
+signUpController.fields = [.usernameAndPassword, .signUpButton, .email, .additional, .dismissButton]
 ```
 </div>
 
-Essentially, you use the bitwise or operator (`|`) to chain up all the options you want to include in the sign up screen, and assign the value to `fields`. Similarly, you can turn off any field by omitting it in the assignment to fields.
+Essentially, you create an array (in Swift), or use the bitwise or operator (for objective-c), to chain all of the options you want to include in the sign up screen, and assign the value to `fields`. Similarly, you can turn off any field by omitting it in the assignment to fields.
 
 ### Responding to Sign Up Success, Failure or Cancellation
 
@@ -300,11 +294,11 @@ When the user signs up or cancels, the `PFSignUpViewController` notifies the del
 ```
 ```swift
 func signUpViewController(signUpController: PFSignUpViewController, didSignUpUser user: PFUser) -> Void {
-  self.dismissViewControllerAnimated(true, completion: nil)
+	self.dismiss(animated: true, completion: nil)
 }
 
 func signUpViewControllerDidCancelSignUp(signUpController: PFSignUpViewController) -> Void {
-  self.dismissViewControllerAnimated(true, completion: nil)
+	self.dismiss(animated: true, completion: nil)
 }
 ```
 </div>
@@ -340,10 +334,10 @@ class MySignUpViewController : PFSignUpViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.view.backgroundColor = UIColor.darkGrayColor()
+    self.view.backgroundColor = .darkGray
 
-    let logoView = UIImageView(image: UIImage(named: "logo.png"))
-    self.signUpView.logo = logoView // 'logo' can be any UIView
+		let logoView = UIImageView(image: UIImage(named: "logo.png"))
+		self.signUpView?.logo = logoView // 'logo' can be any UIView
   }
 }
 ```
@@ -362,12 +356,12 @@ Often you will want to run some client-side validation on the sign up informatio
 }
 ```
 ```swift
-func signUpViewController(signUpController: PFSignUpViewController!,
-                          shouldBeginSignUp info: [NSObject : AnyObject]!) -> Bool {
-    if let password = info?["password"] as? String {
-      return password.utf16Count >= 8
-    }
-    return false
+func signUpViewController(_ signUpController: PFSignUpViewController,
+													shouldBeginSignUp info: [String : String]) -> Bool {
+	if let password = info["password"] {
+		return password.utf16.count >= 8
+	}
+	return false
 }
 ```
 `info` is a dictionary that contains all sign up fields, such as username, password, email, and additional.
@@ -402,20 +396,20 @@ class MySignUpViewController : PFSignUpViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.signUpView.usernameField.placeholder = "phone"
+    self.signUpView?.usernameField?.placeholder = "phone"
   }
 
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
 
-    self.signUpView.signUpButton.frame = CGRectMake(...) // Set a different frame.
+    self.signUpView?.signUpButton?.frame = CGRectMake(...) // Set a different frame.
   }
 
 }
 ```
 </div>
 
-Developer interested in this kind of customization should take a look at the interface of [`PFSignUpView`](http://parseplatform.org/Parse-SDK-iOS-OSX/api/Classes/PFSignUpView.html), where all customizable properties are documented.
+Developers interested in this kind of customization should take a look at the interface of [`PFSignUpView`](http://parseplatform.org/Parse-SDK-iOS-OSX/api/Classes/PFSignUpView.html), where all customizable properties are documented.
 
 ### Portrait and Landscape
 
@@ -504,55 +498,55 @@ The easiest way to understand this class is with an example. This subclass of `P
 @end
 ```
 ```swift
-class SimpleTableViewController : PFQueryTableViewController {
+class SimpleTableViewController: PFQueryTableViewController {
 
-    override init(style: UITableViewStyle, className: String?) {
-        super.init(style: style, className: className)
-        parseClassName = "Todo"
-        pullToRefreshEnabled = true
-        paginationEnabled = true
-        objectsPerPage = 25
+  override init(style: UITableView.Style, className: String?) {
+    super.init(style: style, className: className)
+    parseClassName = "Todo"
+    pullToRefreshEnabled = true
+    paginationEnabled = true
+    objectsPerPage = 25
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    parseClassName = "Todo"
+    pullToRefreshEnabled = true
+    paginationEnabled = true
+    objectsPerPage = 25
+  }
+
+  override func queryForTable() -> PFQuery<PFObject> {
+    let query = PFQuery(className: self.parseClassName!)
+
+    // If no objects are loaded in memory, we look to the cache first to fill the table
+    // and then subsequently do a query against the network.
+    if self.objects!.count == 0 {
+      query.cachePolicy = .cacheThenNetwork
     }
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        parseClassName = "Todo"
-        pullToRefreshEnabled = true
-        paginationEnabled = true
-        objectsPerPage = 25
+    query.order(byDescending: "createdAt")
+
+    return query
+  }
+
+  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath, object: PFObject?) -> PFTableViewCell? {
+    let cellIdentifier = "cell"
+
+    var cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? PFTableViewCell
+    if cell == nil {
+      cell = PFTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     }
 
-    override func queryForTable() -> PFQuery {
-        let query = PFQuery(className: self.parseClassName!)
-
-        // If no objects are loaded in memory, we look to the cache first to fill the table
-        // and then subsequently do a query against the network.
-        if self.objects!.count == 0 {
-            query.cachePolicy = .CacheThenNetwork
-        }
-
-        query.orderByDescending("createdAt")
-
-        return query
+    // Configure the cell to show todo item with a priority at the bottom
+    if let object = object {
+      cell!.textLabel?.text = object["text"] as? String
+      let priority = object["priority"] as? String
+      cell!.detailTextLabel?.text = "Priority \(String(describing: priority))"
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath, object: PFObject?) -> PFTableViewCell? {
-        let cellIdentifier = "cell"
-
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier) as? PFTableViewCell
-        if cell == nil {
-            cell = PFTableViewCell(style: .Subtitle, reuseIdentifier: cellIdentifier)
-        }
-
-        // Configure the cell to show todo item with a priority at the bottom
-        if let object = object {
-            cell!.textLabel?.text = object["text"] as? String
-            let priority = object["priority"] as? String
-            cell!.detailTextLabel?.text = "Priority \(priority)"
-        }
-
-        return cell
-    }
+    return cell
+  }
 }
 ```
 </div>
@@ -567,7 +561,7 @@ A good starting point to learn more is to look at the [API for the class](http:/
 
 ### Loading Remote Images in Cells
 
-`PFQueryTableViewController` makes it simple to display remote images stored in the Parse Cloud as `PFFile`s. All you need to do is to override `tableView:cellForRowAtIndexPath:object:` and return a `PFTableViewCell` with its `imageView`'s `file` property specified. If you would like to display a placeholder image to be shown before the remote image is loaded, assign the placeholder image to the `image` property of the `imageView`.
+`PFQueryTableViewController` makes it simple to display remote images stored in the Parse Cloud as `PFFileObject`s. All you need to do is to override `tableView:cellForRowAtIndexPath:object:` and return a `PFTableViewCell` with its `imageView`'s `file` property specified. If you would like to display a placeholder image to be shown before the remote image is loaded, assign the placeholder image to the `image` property of the `imageView`.
 
 <div class="language-toggle" markdown="1">
 ```objective_c
@@ -580,7 +574,7 @@ A good starting point to learn more is to look at the [API for the class](http:/
     }
     cell.textLabel.text = object[@"title"];
 
-    PFFile *thumbnail = object[@"thumbnail"];
+    PFFileObject *thumbnail = object[@"thumbnail"];
     cell.imageView.image = [UIImage imageNamed:@"placeholder.jpg"];
     cell.imageView.file = thumbnail;
     return cell;
@@ -588,28 +582,28 @@ A good starting point to learn more is to look at the [API for the class](http:/
 @end
 ```
 ```swift
-override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath, object: PFObject?) -> PFTableViewCell? {
-    let identifier = "cell"
+func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath, object: PFObject?) -> PFTableViewCell? {
+	let identifier = "cell"
 
-    var cell = tableView.dequeueReusableCellWithIdentifier(identifier) as? PFTableViewCell
-    if cell == nil {
-        cell = PFTableViewCell(style: .Default, reuseIdentifier: identifier)
-    }
+	var cell = tableView.dequeueReusableCell(withIdentifier: identifier) as? PFTableViewCell
+	if cell == nil {
+		cell = PFTableViewCell(style: .default, reuseIdentifier: identifier)
+	}
 
-    if let object = object {
-        cell?.textLabel?.text = object["title"] as? String
-        cell?.imageView?.image = UIImage(named: "placeholder.jpg")
-        cell?.imageView?.file = object["thumbnail"] as? PFFile
-    }
+	if let object = object {
+		cell?.textLabel?.text = object["title"] as? String
+		cell?.imageView?.image = UIImage(named: "placeholder.jpg")
+		cell?.imageView?.file = object["thumbnail"] as? PFFileObject
+	}
 
-    return cell
+	return cell
 }
 ```
 </div>
 
 <img data-echo="{{ site.baseUrl }}/assets/images/images_table.png" style="max-width:200px"/>
 
-This table shows a list of cute animal photos which are stored in the Parse Cloud, as `PFFile`s. "placeholder.jpg" is an image included in the application bundle which is shown before the animal photos are downloaded.
+This table shows a list of cute animal photos which are stored in the Parse Cloud, as `PFFileObject`s. "placeholder.jpg" is an image included in the application bundle which is shown before the animal photos are downloaded.
 
 The images are downloaded on demand. As you scroll through the table, the images in the currently visible cells are downloaded. This just-in-time behavior is desirable because not only does it conserve bandwidth, it also ensures timely display of visible images. If a more aggressive loading behavior is desired, you can use the `loadInBackground` method on `imageView` to download the image.
 
@@ -657,13 +651,13 @@ When the user is offline or a Parse error was generated from a query, an alert c
 
 ## PFImageView
 
-Many apps need to display images stored in the Parse Cloud as `PFFile`s. However, to load remote images with the built-in `UIImageView` involves writing many lines of boilerplate code. `PFImageView` simplifies this task:
+Many apps need to display images stored in the Parse Cloud as `PFFileObject`s. However, to load remote images with the built-in `UIImageView` involves writing many lines of boilerplate code. `PFImageView` simplifies this task:
 
 <div class="language-toggle" markdown="1">
 ```objective_c
 PFImageView *imageView = [[PFImageView alloc] init];
 imageView.image = [UIImage imageNamed:@"..."]; // placeholder image
-imageView.file = (PFFile *)someObject[@"picture"]; // remote image
+imageView.file = (PFFileObject *)someObject[@"picture"]; // remote image
 
 [imageView loadInBackground];
 ```
@@ -680,7 +674,7 @@ If assigned to, the `image` property is used to display a placeholder before the
 
 ## PFTableViewCell
 
-Many apps need to display table view cells which contain images stored in the Parse Cloud as `PFFile`s. However, to load remote images with the built-in `UITableViewCell` involves writing many lines of boilerplate code. `PFTableViewCell` simplifies this task by exposing an `imageView` property of the type `PFImageView` that supports remote image loading:
+Many apps need to display table view cells which contain images stored in the Parse Cloud as `PFFileObject`s. However, to load remote images with the built-in `UITableViewCell` involves writing many lines of boilerplate code. `PFTableViewCell` simplifies this task by exposing an `imageView` property of the type `PFImageView` that supports remote image loading:
 
 <div class="language-toggle" markdown="1">
 ```objective_c
@@ -693,7 +687,7 @@ Many apps need to display table view cells which contain images stored in the Pa
     }
     cell.textLabel.text = object[@"title"];
 
-    PFFile *thumbnail = object[@"thumbnail"];
+    PFFileObject *thumbnail = object[@"thumbnail"];
     cell.imageView.image = [UIImage imageNamed:@"placeholder.jpg"];
     cell.imageView.file = thumbnail;
     return cell;
@@ -703,26 +697,26 @@ Many apps need to display table view cells which contain images stored in the Pa
 ```
 ```swift
 func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    let identifier = "cell"
-    var cell = tableView.dequeueReusableCellWithIdentifier(identifier) as? PFTableViewCell
-    if cell == nil {
-        cell = PFTableViewCell(style: .Default, reuseIdentifier: identifier)
-    }
+	let identifier = "cell"
+	var cell = tableView.dequeueReusableCell(withIdentifier: identifier) as? PFTableViewCell
+	if cell == nil {
+		cell = PFTableViewCell(style: .default, reuseIdentifier: identifier)
+	}
 
-    if let title = object["title"] as? String {
-        cell!.textLabel.text = title
-    }
-    if let thumbnail = object["thumbnail"] as? PFFile {
-        cell!.imageView.image = UIImage(named: "placeholder.jpg")
-        cell!.imageView.file = thumbnail
-    }
+	if let title = object["title"] as? String {
+		cell!.textLabel.text = title
+	}
+	if let thumbnail = object["thumbnail"] as? PFFileObject {
+		cell!.imageView?.image = UIImage(named: "placeholder.jpg")
+		cell!.imageView.file = thumbnail
+	}
 
-    return cell!
+	return cell!
 }
 ```
 </div>
 
-Like `UITableViewCell`, `PFTableViewCell` supports the default layout styles. Unlike `UITableViewCell`, `PFTableViewCell`'s `imageView` property is of the type `PFImageView`, which supports downloading remote images in `PFFile`.
+Like `UITableViewCell`, `PFTableViewCell` supports the default layout styles. Unlike `UITableViewCell`, `PFTableViewCell`'s `imageView` property is of the type `PFImageView`, which supports downloading remote images in `PFFileObject`.
 
 Although it can be used independently, `PFTableViewCell` really shines when used in `PFQueryTableViewController`. `PFQueryTableViewController` knows about `PFTableViewCell` and loads the images automatically. This behavior is discussed in detail in the documentation for `PFQueryTableViewController`.
 

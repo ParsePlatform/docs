@@ -152,7 +152,7 @@ The response format for all requests is a JSON object.
 
 Whether a request succeeded is indicated by the HTTP status code. A 2xx status code indicates success, whereas a 4xx status code indicates failure. When a request fails, the response body is still JSON, but always contains the fields `code` and `error` which you can inspect to use for debugging. For example, trying to save an object with invalid keys will return the message:
 
-```json
+```jsonc
 {
   "code": 105,
   "error": "invalid field name: bl!ng"
@@ -163,6 +163,6 @@ Whether a request succeeded is indicated by the HTTP status code. A 2xx status c
 
 You should not use the REST API Key in client apps (i.e. code you distribute to your customers). If the Parse SDK is available for your client platform, we recommend using our SDK instead of the REST API. If you must call the REST API directly from the client, you should use the corresponding client-side Parse key for that plaform (e.g. Client Key for iOS/Android, or .NET Key for Windows/Xamarin/Unity).
 
-If there is no Parse SDK for your client platform, please use your app's Client Key to call the REST API. Requests made with the Client Key, JavaScript Key, or Windows Key are restricted by client-side app settings that you configure in your Parse.com app dashboard. These settings make your app more secure. For example, we recommend that all production apps turn off the "Client Push Enabled" setting to prevent push notifications from being sent from any device using the Client Key, JavaScript Key, or .NET Key, but not the REST API Key. Therefore, if you plan on registering installations to enable Push Notifications for your app, you should not distribute any app code with the REST API key embedded in it.
+If there is no Parse SDK for your client platform, please use your app's Client Key to call the REST API. Requests made with the Client Key, JavaScript Key, or Windows Key are restricted by client-side app settings that you configure in your Parse Dashboard app dashboard. These settings make your app more secure. For example, we recommend that all production apps turn off the "Client Push Enabled" setting to prevent push notifications from being sent from any device using the Client Key, JavaScript Key, or .NET Key, but not the REST API Key. Therefore, if you plan on registering installations to enable Push Notifications for your app, you should not distribute any app code with the REST API key embedded in it.
 
 The JavaScript Key cannot be used to make requests directly against the REST API from JavaScript. The JavaScript Key is meant to be used with the Parse JavaScript SDK, which makes its posts through a Cross Origin-friendly format without HTTP headers.

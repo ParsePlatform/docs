@@ -4,4 +4,8 @@ The fastest and easiest way to start using Parse Server is to run MongoDB and Pa
 
 {% include_relative _includes/parse-server/deploying-heroku-mlab.md %}
 
-{% include_relative _includes/parse-server/deploying-hyperdev-mlab.md %}
+{% include_relative _includes/parse-server/deploying-glitch-mlab.md %}
+
+{% include_relative _includes/parse-server/deploying-back4app.md %}
+
+{% include_relative _includes/parse-server/deploying-aws-ubuntu.md %}

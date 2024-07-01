@@ -16,7 +16,7 @@ The following is a list of all the error codes that can be returned by the Parse
 | `InvalidJSON`                    |  107 | Badly formed JSON was received upstream. This either indicates you have done something unusual with modifying how things encode to JSON, or the network is failing badly. Can also indicate an invalid utf-8 string or use of multiple form encoded values. Check error message for more details.  |
 | `CommandUnavailable`	           |  108 | The feature you tried to access is only available internally for testing purposes. |
 | `NotInitialized`	               |  109 | You must call Parse.initialize before using the Parse library. Check the Quick Start guide for your platform. |
-| `ObjectTooLarge`	               |  116 | The object is too large. Parse Objects have a max size of 128 kilobytes. |
+| `ObjectTooLarge`	               |  116 | The object is too large. |
 | `ExceededConfigParamsError`      |  116 | You have reached the limit of 100 config parameters. |
 | `InvalidLimitError`	             |  117 | An invalid value was set for the limit. Check error message for more details. |
 | `InvalidSkipError`	             |  118 | An invalid value was set for skip. Check error message for more details. |
@@ -32,8 +32,6 @@ The following is a list of all the error codes that can be returned by the Parse
 | `ScriptFailed`	                 |  141 | Cloud Code script failed. Usually points to a JavaScript error. Check error message for more details. |
 | `FunctionNotFound`	             |  141 | Cloud function not found. Check that the specified Cloud function is present in your Cloud Code script and has been deployed. |
 | `JobNotFound`	                   |  141 | Background job not found. Check that the specified job is present in your Cloud Code script and has been deployed. |
-| `SuccessErrorNotCalled`          |  141 | success/error was not called. A cloud function will return once response.success() or response.error() is called. A background job will similarly finish execution once status.success() or status.error() is called. If a function or job never reaches either of the success/error methods, this error will be returned. This may happen when a function does not handle an error response correctly, preventing code execution from reaching the success() method call. |
-| `MultupleSuccessErrorCalls`      |  141 | Can't call success/error multiple times. A cloud function will return once response.success() or response.error() is called. A background job will similarly finish execution once status.success() or status.error() is called. If a function or job calls success() and/or error() more than once in a single execution path, this error will be returned. |
 | `ValidationFailed`	             |  142 | Cloud Code validation failed. |
 | `WebhookError`	                 |  143 | Webhook error. |
 | `InvalidImageData`	             |  150 | Invalid image data. |
@@ -79,7 +77,8 @@ The following is a list of all the error codes that can be returned by the Parse
 | `InvalidContentLength`	         |  128 | Invalid content length. |
 | `FileTooLarge`	                 |  129 | File size exceeds maximum allowed. |
 | `FileSaveError`	                 |  130 | Error saving a file. |
-| `FileDeleteError`	               |  131 | File could not be deleted. |
+| `FileDeleteError`	               |  153 | File could not be deleted. |
+| `FileDeleteUnnamedError`	               |  161 | Unnamed file could not be deleted. |
 {: .docs_table}
 
 ## Installation related errors
@@ -162,9 +161,6 @@ The following is a list of all the error codes that can be returned by the Parse
 |----------------------------------|------|---------------------------------------------------------------|
 | `RequestTimeout`                 |  124 | The request was slow and timed out. Typically this indicates that the request is too expensive to run. You may see this when a Cloud function did not finish before timing out, or when a `Parse.Cloud.httpRequest` connection times out.  |
 | `InefficientQueryError`	         |  154 | An inefficient query was rejected by the server. Refer to the Performance Guide and slow query log. |
-| `RequestLimitExceeded`	         |  155 | This application has exceeded its request limit (legacy Parse.com apps only). |
-| `TemporaryRejectionError`	       |  159 | An application's requests are temporary rejected by the server (legacy Parse.com apps only). |
-| `DatabaseNotMigratedError`       |  428 | You should migrate your database as soon as possible (legacy Parse.com apps only). |
 {: .docs_table}
 
 ## Other issues
@@ -176,3 +172,26 @@ The following is a list of all the error codes that can be returned by the Parse
 | `ServiceUnavailable`	           |    2 | The service is currently unavailable.                           |
 | `ClientDisconnected`	           |    4 | Connection failure.                                             |
 {: .docs_table}
+
+## Error Code Ranges
+
+In order to provide better organization and avoid conflicts with Parse Platform's built-in `Parse.Error` codes, the following ranges are defined:
+
+### Parse Server and Related Modules
+
+- Error code range: `<= 4999` (including negative numbers)
+- This range is reserved exclusively for errors generated by Parse Server and its directly related modules. It includes all predefined errors listed in the documentation.
+
+### Reserved
+
+- Error code range: `>= 5000 and <= 8999`
+- This range is currently reserved for future use and should not be used by anyone.
+
+### App Developers (Custom App Errors)
+
+- Error code range: `>= 9000 and <= 9999`
+- Developers may use this range for defining custom errors specific to their applications. This range is reserved to ensure that custom application errors do not conflict with those defined by Parse Server and its modules.
+
+### 3rd Party Providers of Parse Platform Components
+
+- We discourage from introducing new custom error codes in 3rd party components, as they may conflict with either of the reserved ranges mentioned above. Instead, use the general internal Parse Server error code `1` and add any specific information in the error message, or use another pre-defined error code of Parse Platform.

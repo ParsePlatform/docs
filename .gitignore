@@ -1,5 +1,6 @@
 # Generated site
 _site/
+.jekyll-metadata
 
 # Logs
 logs/
@@ -14,3 +15,11 @@ node_modules
 
 # OS X
 .DS_Store
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+.jekyll-metadata

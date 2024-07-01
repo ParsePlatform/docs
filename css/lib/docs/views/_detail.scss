@@ -152,6 +152,16 @@
         }
     }
 
+    .highlight {
+        position: relative;
+    }
+    .btn-copy {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+    }
+
     .toggles{
         text-align: right;
         padding-top: 15px;

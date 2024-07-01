@@ -12,7 +12,7 @@ let configuration = ParseClientConfiguration {
     $0.clientKey = ""
     $0.server = "http://localhost:1337/parse"
 }
-Parse.initializeWithConfiguration(configuration)
+Parse.initialize(with: configuration)
 ```
 
 _Objective-C_

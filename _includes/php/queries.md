@@ -63,6 +63,32 @@ You can skip the first results by setting `skip`. In the old Parse hosted backen
 $query->skip(10); // skip the first 10 results
 ```
 
+### With Count
+
+If you want to know the total number of rows in a table satisfying your query, for  e.g. pagination purposes - you can use `withCount`. 
+
+**Note:** Using this feature will change the structure of response, see the example below.
+
+Let's say you have 200 rows in a table called `GameScore`:
+
+```php
+$query = new ParseQuery('GameScore');
+$query->withCount();
+$query->limit(25);
+
+$response = $query->find();
+$response['count'] // Returns 200 the total number of objects dispite limit / skip
+$response['results'] // Returns 25 objects
+
+// As of PHP 7.1 you can use Array Destructuring
+['count' => $count, 'results' => $results] = $query->find();
+
+// Use $count and $results
+```
+⚠️ Сount operations can be slow and expensive.
+
+If you only want to get the count without objects - use [Counting Objects](#counting-objects).
+
 ### Ascending and Descending
 
 For sortable types like numbers and strings, you can control the order in which results are returned:
@@ -160,6 +186,18 @@ $results = $losingUserQuery->find();
 ```
 
 ### Select
+
+To filter rows based on `objectId`'s from pointers in a second table, you can use dot notation:
+
+```javascript
+$rolesOfTypeX = new ParseQuery('Role');
+$rolesOfTypeX->equalTo('type', 'x');
+
+$groupsWithRoleX = new ParseQuery('Group');
+$groupsWithRoleX->matchesKeyInQuery('objectId', 'belongsTo.objectId', rolesOfTypeX);
+$results = $groupsWithRoleX->find();
+// results has the list of groups with role x
+```
 
 You can restrict the fields returned by calling `select` with an array of keys. To retrieve documents that contain only the `score` and `playerName` fields (and also special built-in fields such as `objectId`, `createdAt`, and `updatedAt`):
 
@@ -269,10 +307,6 @@ $query->containsAll("arrayKey", [2, 3, 4]);
 ```
 
 ## Queries on String Values
-
-<div class='tip info'><div>
- If you're trying to implement a generic search feature, we recommend taking a look at this blog post: <a href="http://blog.parse.com/learn/engineering/implementing-scalable-search-on-a-nosql-backend/">Implementing Scalable Search on a NoSQL Backend</a>.
-</div></div>
 
 Use `startsWith` to restrict to string values that start with a particular string. Similar to a MySQL LIKE operator, this is indexed so it is efficient for large datasets:
 
@@ -446,4 +480,16 @@ class Monster extends ParseObject
 $monster = Monster::spawn(200);
 echo monster->strength();  // Displays 200.
 echo monster->hasSuperHumanStrength();  // Displays true.
+```
+
+## Read Preference
+
+When using a MongoDB replica set, you can use the `$query->readPreference(readPreference, includeReadPreference, subqueryReadPreference)` function to choose from which replica the objects will be retrieved. The `includeReadPreference` argument chooses from which replica the included pointers will be retrieved and the `subqueryReadPreference` argument chooses in which replica the subqueries will run. The possible values are `PRIMARY` (default), `PRIMARY_PREFERRED`, `SECONDARY`, `SECONDARY_PREFERRED`, or `NEAREST`. If the `includeReadPreference` argument is not passed, the same replica chosen for `readPreference` will be also used for the includes. The same rule applies for the `subqueryReadPreference` argument.
+
+```javascript
+$query->readPreference(
+  "SECONDARY",
+  "SECONDARY_PREFERRED",
+  "NEAREST"
+);
 ```

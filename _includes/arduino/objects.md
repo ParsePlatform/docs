@@ -16,7 +16,7 @@ Each object has a class name that you can use to distinguish different sorts of 
 
 ## Saving Objects
 
-Let's say you want to save the `Temperature` described above to the Parse Cloud. You would do the following:
+Let's say you want to save the `Temperature` described above to your Parse Server. You would do the following:
 
 ```cpp
 ParseObjectCreate create;
@@ -35,13 +35,20 @@ response.close(); // Free the resource
 
 After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at the Data Browser in your app on Parse. You should see something like this:
 
-```javascript
-	objectId: "xWMyZ4YEGZ", temperature: 175.0, leverDown: true, createdAt: "2011-06-10T18:33:42Z", updatedAt: "2011-06-10T18:33:42Z"
+```jsonc
+{
+  "objectId": "xWMyZ4YEGZ",
+  "score": 1337,
+  "playerName": "Sean Plott",
+  "cheatMode": false,
+  "createdAt":"2022-01-01T12:23:45.678Z",
+  "updatedAt":"2022-01-01T12:23:45.678Z"
+}
 ```
 
 There are two things to note here. You didn't have to configure or set up a new Class called `Temperature` before running this code. Your Parse app lazily creates this Class for you when it first encounters it.
 
-There are also a few fields you don't need to specify that are provided as a convenience. `objectId` is a unique identifier for each saved object. `createdAt` and`updatedAt` represent the time that each object was created and last modified in the Parse Cloud. Each of these fields is filled in by Parse, so they don't exist on a Parse Object until a save operation has completed.
+There are also a few fields you don't need to specify that are provided as a convenience. `objectId` is a unique identifier for each saved object. `createdAt` and`updatedAt` represent the time that each object was created and last modified in your Parse Server. Each of these fields is filled in by Parse, so they don't exist on a Parse Object until a save operation has completed.
 
 ## Retrieving Objects
 
@@ -106,12 +113,12 @@ create.setClassName("TestObject");
 create.add("number", 42.0);
 create.add("foo", "bar");
 create.addGeoPoint("location", 40.0, -30.0);
-create.addJSONValue("dateField", "{ \"__type\": \"Date\", \"iso\": \"2011-08-21T18:02:52.249Z\" }"); create.addJSONValue("arrayField", "[ 30, \"string\" ]");
+create.addJSONValue("dateField", "{ \"__type\": \"Date\", \"iso\": \"2022-01-01T12:23:45.678Z\" }"); create.addJSONValue("arrayField", "[ 30, \"string\" ]");
 create.addJSONValue("objectField", "{ \"number\": 30, \"string\": \"baz\" }");
 create.addJSONValue("emptyField", "null");
 create.send();
 ```
 
-We do not recommend storing large pieces of binary data like images or documents in a `ParseObject`. `ParseObject`s should not exceed 128 kilobytes in size. We recommend you use `ParseFile`s to store images, documents, and other types of files. You can do so by instantiating a `ParseFile` object and setting it on a field. See the [Files section in the REST documentation]({{ site.baseUrl }}/rest/guide/#files) for more details.
+We do not recommend storing large pieces of binary data like images or documents in a `ParseObject`. We recommend you use `ParseFile`s to store images, documents, and other types of files. You can do so by instantiating a `ParseFile` object and setting it on a field. See the [Files section in the REST documentation]({{ site.baseUrl }}/rest/guide/#files) for more details.
 
 For more information about how Parse handles data, check out our documentation on [Data]({{ site.baseUrl }}/rest/guide/#data).

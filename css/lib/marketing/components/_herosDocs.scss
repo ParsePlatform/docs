@@ -31,6 +31,12 @@
         &.unity_docs_header{
           background-color: $unityPlatform;
         }
+        &.flutter_docs_header{
+          background-color: $flutterPlatform;
+        }
+        &.dart_docs_header{
+          background-color: $dartPlatform;
+        }
         &.php_docs_header{
           background-color: $phpPlatform;
         }
@@ -45,6 +51,9 @@
         }
         &.rest_docs_header{
           background-color: $restPlatform;
+        }
+        &.graphql_docs_header{
+          background-color: $graphqlPlatform;
         }
 
         .grid-container{

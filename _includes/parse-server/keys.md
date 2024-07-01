@@ -8,4 +8,4 @@ However, you have the option to specify any of these four keys upon initializati
 
 Starting `parse-server` 2.6.5, it is possible to specify a `readOnlyMasterKey`. When using this key instead of the masterKey, the server will perform all `read` operations as if they were executing with the `masterKey` but will fail to execute any `write` operation.
 
-This key is expecially powerful when used with `parse-dashboard`. Please refer to [Parse Dashboard](https://github.com/parse-community/parse-dashboard/)'s documentation for more information.
+This key is especially powerful when used with `parse-dashboard`. Please refer to [Parse Dashboard](https://github.com/parse-community/parse-dashboard/)'s documentation for more information.

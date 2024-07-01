@@ -20,7 +20,7 @@ Our initial analytics hook allows you to track your application being launched. 
 ```
 ```swift
 // in iOS
-PFAnalytics.trackAppOpenedWithLaunchOptions(launchOptions)
+PFAnalytics.trackAppOpened(launchOptions: launchOptions)
 
 // in OS X
 PFAnalytics.trackAppOpenedWithLaunchOptions(nil)

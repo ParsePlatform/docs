@@ -2,13 +2,13 @@
 
 ## httpRequest
 
-You can use your favorite npm module to make HTTP requests, such as [request](https://www.npmjs.com/package/request). Parse Server also supports `Parse.Cloud.httpRequest` for legacy reasons. It allows you to send HTTP requests to any HTTP Server. This function takes an options object to configure the call.
+You can use your favorite npm module to make HTTP requests, such as [axios](https://www.npmjs.com/package/axios). Parse Server also supports `Parse.Cloud.httpRequest` for legacy reasons. It allows you to send HTTP requests to any HTTP Server. This function takes an options object to configure the call.
 
 A simple GET request would look like:
 
 ```javascript
 Parse.Cloud.httpRequest({
-  url: 'http://www.parse.com/'
+  url: 'https://www.awesomewebsite.com/'
 }).then(function(httpResponse) {
   // success
   console.log(httpResponse.text);
@@ -24,7 +24,7 @@ A GET request that specifies the port number would look like:
 
 ```javascript
 Parse.Cloud.httpRequest({
-  url: 'http://www.parse.com:8080/'
+  url: 'https://www.awesomewebsite.com:8080/'
 }).then(function(httpResponse) {
   console.log(httpResponse.text);
 }, function(httpResponse) {
@@ -33,6 +33,19 @@ Parse.Cloud.httpRequest({
 ```
 
 Valid port numbers are 80, 443, and all numbers from 1025 through 65535.
+
+By default, `Parse.Cloud.httpRequest` does not follow redirects caused by HTTP 3xx response codes, the `followRedirects: true` option can be used to change this.
+
+```javascript
+Parse.Cloud.httpRequest({
+  url: 'https://www.awesomewebsite.com/',
+  followRedirects: true
+}).then(function(httpResponse) {
+  console.log(httpResponse.text);
+}, function(httpResponse) {
+  console.error('Request failed with response code ' + httpResponse.status);
+});
+```
 
 ### Query Parameters
 
@@ -193,7 +206,7 @@ end
 
 Here's an example of the JSON data that would be sent in the request to this webhook:
 
-```json
+```jsonc
 // Sent to webhook
 {
   "master": false,
@@ -212,14 +225,14 @@ Here's an example of the JSON data that would be sent in the request to this web
 
 This response would indicate a success in the webhook:
 
-```json
+```jsonc
 // Returned from the webhook on success
 { "success": "Hello World!" }
 ```
 
 This response would indicate an error in the webhook:
 
-```json
+```jsonc
 // Returned from the webhook on error
 { "error": "Error message >:(" }
 ```
@@ -262,7 +275,7 @@ end
 
 Here's an example of the JSON data that would be sent in the request to this webhook:
 
-```json
+```jsonc
 // Sent to webhook
 {
   "master": true,
@@ -274,7 +287,7 @@ Here's an example of the JSON data that would be sent in the request to this web
 
 This response would indicate a success in the webhook:
 
-```json
+```jsonc
 // Returned from the webhook on success
 { "success": "User billed!" }
 ```
@@ -297,7 +310,7 @@ For triggers, the following parameters are sent to your webhook.
 
 To respond to a `beforeSave` request, send a JSON object with the key `error` or `success` set. This is the same as for Cloud functions, but there's an extra capability with `beforeSave` triggers. By returning an error, you will cancel the save request and the object will not be stored on Parse. You can also return a JSON object in this following format to override the values that will be saved for the object:
 
-```json
+```jsonc
 {
   "className": "AwesomeClass",
   "existingColumn": "sneakyChange",
@@ -335,7 +348,7 @@ end
 
 Here's an example of the JSON data that would be sent in the request to this webhook:
 
-```json
+```jsonc
 // Sent to webhook
 {
   "master": false,
@@ -406,7 +419,7 @@ end
 
 Here's an example of the JSON data that would be sent in the request to this webhook:
 
-```json
+```jsonc
 // Sent to webhook
 {
   "master": false,
@@ -472,7 +485,7 @@ end
 
 Here's an example of the JSON data that would be sent in the request to this webhook:
 
-```json
+```jsonc
 // Sent to webhook
 {
   "master": false,
@@ -496,7 +509,7 @@ Here's an example of the JSON data that would be sent in the request to this web
 
 This response would indicate a success in the webhook:
 
-```json
+```jsonc
 // Returned from the webhook on success
 { "success": true }
 ```
@@ -541,7 +554,7 @@ end
 
 Here's an example of the JSON data that would be sent in the request to this webhook:
 
-```json
+```jsonc
 // Sent to webhook
 {
   "master": false,
@@ -569,3 +582,13 @@ Here's an example of the JSON data that would be sent in the request to this web
 ```
 
 After setting up your webhook in the Dashboard UI, you'll be acurately decrementing comment counts!
+
+# Config
+Parse Config offers a convenient way to configure parameters in Cloud Code.
+
+```javascript
+const config = await Parse.Config.get({useMasterKey: true});
+const privateParam = config.get("privateParam");
+```
+
+By default, Parse Config parameters can be publicly read which may be undesired if the parameter contains sensitive information that should not be exposed to clients. A parameter can be made readable only with the master key by setting the `Requires master key?` property via the Parse Dashboard to `Yes`.

@@ -19,5 +19,38 @@
     gtag('js', new Date());
 
     gtag('config', 'UA-102564547-3');
+
+    window.onload = function () {
+      function copyToClipboard() {
+        const textId = this.id.replace('btn','code')
+        const copyText = document.getElementById(textId);
+        const text = copyText.textContent || copyText.innerText;
+
+        const input = document.createElement('textarea');
+        input.innerHTML = text.replace(/\n$/, '');
+        document.body.appendChild(input);
+        input.select();
+        input.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        document.body.removeChild(input);
+
+        this.innerHTML = '✔️';
+        setTimeout(() => {
+          this.innerHTML = '📋';
+        },2000)
+      }
+    let codes = document.querySelectorAll('.highlight > pre > code');
+    let count = 0;
+    codes.forEach((code) => {
+      code.setAttribute("id", `code-${count}`);
+      const btn = document.createElement('button');
+      btn.innerHTML = "📋";
+      btn.className = "btn-copy";
+      btn.setAttribute("id", `btn-${count}`);
+      btn.addEventListener("click",copyToClipboard);
+      code.before(btn);
+      count++;
+    });
+   }
   </script>
 </html>

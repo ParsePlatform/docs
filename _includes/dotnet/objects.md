@@ -17,7 +17,7 @@ Each `ParseObject` has a class name that you can use to distinguish different so
 
 ## Saving Objects
 
-Let's say you want to save the `GameScore` described above to the Parse Cloud. The interface is similar to an `IDictionary<string, object>`, plus the `SaveAsync` method:
+Let's say you want to save the `GameScore` described above to your Parse Server. The interface is similar to an `IDictionary<string, object>`, plus the `SaveAsync` method:
 
 ```cs
 ParseObject gameScore = new ParseObject("GameScore");
@@ -28,14 +28,20 @@ await gameScore.SaveAsync();
 
 After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at the Data Browser in your app on Parse. You should see something like this:
 
-```javascript
-objectId: "xWMyZ4YEGZ", score: 1337, playerName: "Sean Plott", cheatMode: false,
-createdAt:"2011-06-10T18:33:42Z", updatedAt:"2011-06-10T18:33:42Z"
+```jsonc
+{
+  "objectId": "xWMyZ4YEGZ",
+  "score": 1337,
+  "playerName": "Sean Plott",
+  "cheatMode": false,
+  "createdAt":"2022-01-01T12:23:45.678Z",
+  "updatedAt":"2022-01-01T12:23:45.678Z"
+}
 ```
 
 There are two things to note here. You didn't have to configure or set up a new Class called `GameScore` before running this code. Your Parse app lazily creates this Class for you when it first encounters it.
 
-There are also a few fields you don't need to specify that are provided as a convenience. `ObjectId` is a unique identifier for each saved object. `CreatedAt` and `UpdatedAt` represent the time that each object was created and last modified in the Parse Cloud. Each of these fields is filled in by Parse, so they don't exist on a `ParseObject` until a save operation has completed.
+There are also a few fields you don't need to specify that are provided as a convenience. `ObjectId` is a unique identifier for each saved object. `CreatedAt` and `UpdatedAt` represent the time that each object was created and last modified in your Parse Server. Each of these fields is filled in by Parse, so they don't exist on a `ParseObject` until a save operation has completed.
 
 ## Data Types
 
@@ -74,7 +80,7 @@ bigObject["myDictionary"] = dictionary;
 await bigObject.SaveAsync();
 ```
 
-We do not recommend storing large pieces of binary data like images or documents on `ParseObject`. `ParseObject`s should not exceed 128 kilobytes in size. We recommend you use `ParseFile`s to store images, documents, and other types of files. You can do so by instantiating a `ParseFile` object and setting it on a field. See [Files](#files) for more details.
+We do not recommend storing large pieces of binary data like images or documents on `ParseObject`. We recommend you use `ParseFile`s to store images, documents, and other types of files. You can do so by instantiating a `ParseFile` object and setting it on a field. See [Files](#files) for more details.
 
 For more information about how Parse handles data, check out our documentation on [Data](#data).
 
@@ -178,7 +184,7 @@ You can delete a single field from an object with the `Remove` method:
 // After this, the playerName field will be empty
 myObject.Remove("playerName");
 
-// Saves the field deletion to the Parse Cloud
+// Saves the field deletion to Parse Server
 await myObject.SaveAsync();
 ```
 

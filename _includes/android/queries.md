@@ -152,6 +152,19 @@ losingUserQuery.findInBackground(new FindCallback<ParseUser>() {
   }
 });
 ```
+<p>To filter rows based on <code class="highlighter-rouge">objectId</code>’s from pointers in a second table, you can use dot notation:</p>
+
+```java
+ParseQuery<ParseObject> chartersOfTypeX = ParseQuery.getQuery("Charter");
+charterOfTypeX.equalTo('type', 'x');
+
+ParseQuery<ParseObject> groupsWithoutCharterX = ParseQuery.getQuery("Group");
+groupsWithoutCharterX.doesNotMatchKeyInQuery("objectId", "belongsTo.objectId", chartersOfTypeX);
+groupsWithoutCharterX.findInBackground(new FindCallback<ParseObject>() {
+  void done(List<ParseObject> results, ParseException e) {
+   // results has the list of groups without charter x
+ });
+```
 
 You can restrict the fields returned by calling `selectKeys` with a collection of keys. To retrieve documents that contain only the `score` and `playerName` fields (and also special built-in fields such as `objectId`, `createdAt`, and `updatedAt`):
 
@@ -194,10 +207,6 @@ query.whereContainsAll("arrayKey", numbers);
 
 ## Queries on String Values
 
-<div class='tip info'><div>
-  If you're trying to implement a generic search feature, we recommend taking a look at this blog post: <a href='http://blog.parse.com/learn/engineering/implementing-scalable-search-on-a-nosql-backend/'>Implementing Scalable Search on a NoSQL Backend</a>.
-</div></div>
-
 Use `whereStartsWith` to restrict to string values that start with a particular string. Similar to a MySQL LIKE operator, this is indexed so it is efficient for large datasets:
 
 ```java
@@ -221,7 +230,7 @@ You can use `whereFullText` for efficient search capabilities. Text indexes are 
 ```java
 // Finds barbecue sauces that start with 'Big Daddy's'.
 ParseQuery<ParseObject> query = ParseQuery.getQuery("BarbecueSauce");
-query.whereFullText("name", "Big Daddy's");
+query.whereFullText("name", "bbq");
 ```
 
 The above example will match any `BarbecueSauce` objects where the value in the "name" String key contains "bbq". For example, both "Big Daddy's BBQ", "Big Daddy's bbq" and "Big BBQ Daddy" will match.
@@ -376,13 +385,27 @@ Now when you do any query with `fromLocalDatastore`, these objects will be inclu
 For instance, to query the cache first and then the network,
 
 ```java
-final ParseQuery query = ...
+final ParseQuery query = ParseQuery.getQuery("GameScore");
 query.fromLocalDatastore().findInBackground().continueWithTask((task) -> {
   // Update UI with results from Local Datastore ...
+  ParseException error = task.getError();
+  if(error == null){
+    List<ParseObject> gameScore = task.getResult();
+    for(ParseObject game : gameScore){
+        //...
+    }
+  }
   // Now query the network:
   return query.fromNetwork().findInBackground();
 }, Task.UI_EXECUTOR).continueWithTask((task) -> {
   // Update UI with results from Network ...
+  ParseException error = task.getError();
+  if(error == null){
+    List<ParseObject> gameScore = task.getResult();
+    for(ParseObject game : gameScore){
+        //...
+    }
+  }
   return task;
 }, Task.UI_EXECUTOR);
 ```
@@ -390,11 +413,18 @@ query.fromLocalDatastore().findInBackground().continueWithTask((task) -> {
 Or you might want to query the cache, and if that fails, fire a network call:
 
 ```java
-final ParseQuery query = ...
+final ParseQuery query = ParseQuery.getQuery("GameScore");
 query.fromLocalDatastore().findInBackground().continueWithTask((task) -> {
   Exception error = task.getError();
   if (error instanceof ParseException && ((ParseException) error).getCode() == ParseException.CACHE_MISS) {
     // No results from cache. Let's query the network.
+    ParseException error = task.getError();
+    if(error == null){
+      List<ParseObject> gameScore = task.getResult();
+      for(ParseObject game : gameScore){
+          //...
+      }
+    }
     return query.fromNetwork().findInBackground();
   }
   return task;

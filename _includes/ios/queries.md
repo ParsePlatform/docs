@@ -27,24 +27,20 @@ PFQuery *query = [PFQuery queryWithClassName:@"GameScore"];
 }];
 ```
 ```swift
-var query = PFQuery(className:"GameScore")
+let query = PFQuery(className:"GameScore")
 query.whereKey("playerName", equalTo:"Sean Plott")
-query.findObjectsInBackgroundWithBlock {
-  (objects: [PFObject]?, error: NSError?) -> Void in
-
-  if error == nil {
-    // The find succeeded.
-    print("Successfully retrieved \(objects!.count) scores.")
-    // Do something with the found objects
-    if let objects = objects {
-      for object in objects {
-        print(object.objectId)
-      }
+query.findObjectsInBackground { (objects: [PFObject]?, error: Error?) in
+    if let error = error {
+        // Log details of the failure
+        print(error.localizedDescription)
+    } else if let objects = objects {
+        // The find succeeded.
+        print("Successfully retrieved \(objects.count) scores.")
+        // Do something with the found objects
+        for object in objects {
+            print(object.objectId as Any)
+        }
     }
-  } else {
-    // Log details of the failure
-    print("Error: \(error!) \(error!.userInfo)")
-  }
 }
 ```
 </div>
@@ -93,7 +89,7 @@ PFQuery *query = [PFQuery queryWithClassName:@"GameScore" predicate:predicate];
 ```
 ```swift
 let predicate = NSPredicate(format: "playerName = 'Dan Stemkosk'")
-var query = PFQuery(className: "GameScore", predicate: predicate)
+let query = PFQuery(className: "GameScore", predicate: predicate)
 ```
 </div>
 
@@ -186,16 +182,18 @@ PFQuery *query = [PFQuery queryWithClassName:@"GameScore"];
 }];
 ```
 ```swift
-var query = PFQuery(className: "GameScore")
+let query = PFQuery(className: "GameScore")
 query.whereKey("playerEmail", equalTo: "dstemkoski@example.com")
-query.getFirstObjectInBackgroundWithBlock {
-  (object: PFObject?, error: NSError?) -> Void in
-  if error != nil || object == nil {
-    print("The getFirstObject request failed.")
-  } else {
-    // The find succeeded.
-    print("Successfully retrieved the object.")
-  }
+query.getFirstObjectInBackground { (object: PFObject?, error: Error?) in
+    if let error = error {
+        // The query failed
+        print(error.localizedDescription)
+    } else if let object = object {
+        // The query succeeded with a matching result
+        print(object)
+    } else {
+        // The query succeeded but no matching result was found
+    }
 }
 ```
 </div>
@@ -223,10 +221,10 @@ For sortable types like numbers and strings, you can control the order in which 
 ```
 ```swift
 // Sorts the results in ascending order by the score field
-query.orderByAscending("score")
+query.order(byAscending: "score")
 
 // Sorts the results in descending order by the score field
-query.orderByDescending("score")
+query.order(byDescending: "score")
 ```
 </div>
 
@@ -326,7 +324,7 @@ query.whereKey("playerName", containedIn: names)
 
 // Using NSPredicate
 let names = ["Jonathan Walsh", "Dario Wunsch", "Shawn Simon"]
-let pred = NSPredicate(format: "playerName IN %@", names)
+let predicate = NSPredicate(format: "playerName IN %@", names)
 let query = PFQuery(className: "GameScore", predicate: predicate)
 ```
 </div>
@@ -353,7 +351,7 @@ query.whereKey("playerName", notContainedIn: names)
 
 // Using NSPredicate
 let names = ["Jonathan Walsh", "Dario Wunsch", "Shawn Simon"]
-let pred = NSPredicate(format: "NOT (playerName IN %@)", names)
+let predicate = NSPredicate(format: "NOT (playerName IN %@)", names)
 let query = PFQuery(className: "GameScore", predicate: predicate)
 ```
 </div>
@@ -402,16 +400,18 @@ PFQuery *userQuery = [PFQuery queryForUser];
 }];
 ```
 ```swift
-var teamQuery = PFQuery(className:"Team")
+let teamQuery = PFQuery(className:"Team")
 teamQuery.whereKey("winPct", greaterThan:0.5)
-var userQuery = PFUser.query()
-userQuery!.whereKey("hometown", matchesKey:"city", inQuery:teamQuery)
-userQuery!.findObjectsInBackgroundWithBlock {
-  (results: [PFObject]?, error: NSError?) -> Void in
-  if error == nil {
-    // results will contain users with a hometown team with a winning record
-  }
-}
+let userQuery = PFUser.query()
+userQuery?.whereKey("hometown", matchesKey: "city", in: teamQuery)
+userQuery?.findObjectsInBackground(block: { (results: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The query failed
+        print(error.localizedDescription)
+    } else {
+        // results will contain users with a hometown team with a winning record
+    }
+})
 ```
 </div>
 
@@ -426,12 +426,18 @@ PFQuery *losingUserQuery = [PFQuery queryForUser];
 }];
 ```
 ```swift
-var losingUserQuery = PFUser.query()
-losingUserQuery!.whereKey("hometown", doesNotMatchKey:"city", inQuery:teamQuery)
-losingUserQuery!.findObjectsInBackgroundWithBlock {
-  (results: [PFObject]?, error: NSError?) -> Void in
-  // results will contain users with a hometown team with a losing records
-}
+let teamQuery = PFQuery(className:"Team")
+teamQuery.whereKey("winPct", greaterThan:0.5)
+let losingUserQuery = PFUser.query()
+losingUserQuery?.whereKey("hometown", doesNotMatchKey:"city", in: teamQuery)
+losingUserQuery?.findObjectsInBackground(block: { (results: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The query failed
+        print(error.localizedDescription)
+    } else {
+        // results will contain users with a hometown team with a losing records
+    }
+})
 ```
 </div>
 
@@ -446,13 +452,15 @@ PFQuery *query = [PFQuery queryWithClassName:@"GameScore"];
 }];
 ```
 ```swift
-var query = PFQuery(className:"GameScore")
+let query = PFQuery(className:"GameScore")
 query.selectKeys(["playerName", "score"])
-query.findObjectsInBackgroundWithBlock {
-  (objects: [PFObject]?, error: NSError?) -> Void in
-  if error == nil {
-    // objects in results will only contain the playerName and score fields
-  }
+query.findObjectsInBackground { (objects: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The query failed
+        print(error.localizedDescription)
+    } else {
+        // objects in results will only contain the playerName and score fields
+    }
 }
 ```
 </div>
@@ -467,11 +475,16 @@ PFObject *object = (PFObject*)results[0];
 }];
 ```
 ```swift
-var object = results[0] as PFObject!
-object.fetchIfNeededInBackgroundWithBlock {
-  (object: PFObject?, error: NSError?) -> Void in
-  // all fields of the object will now be available here.
-}
+// Use array of PFObjects from earlier query
+var object = objects?[0] as! PFObject
+object.fetchInBackground(block: { (object: PFObject?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // all fields of the object will now be available here.
+    }
+})
 ```
 </div>
 
@@ -511,15 +524,11 @@ You can also find objects where the key's array value contains each of the value
 ```swift
 // Find objects where the array in arrayKey contains each of the
 // elements 2, 3, and 4.
-query.whereKey("arrayKey", containsAllObjectsInArray:[2, 3, 4])
+query.whereKey("arrayKey", containsAllObjectsIn:[2, 3, 4])
 ```
 </div>
 
 ## Queries on String Values
-
-<div class='tip info'><div>
- If you're trying to implement a generic search feature, we recommend taking a look at this blog post: <a href="http://blog.parse.com/learn/engineering/implementing-scalable-search-on-a-nosql-backend/">Implementing Scalable Search on a NoSQL Backend</a>.
-</div></div>
 
 Use `whereKey:hasPrefix:` to restrict to string values that start with a particular string. Similar to a MySQL LIKE operator, this is indexed so it is efficient for large datasets:
 
@@ -537,7 +546,7 @@ PFQuery *query = [PFQuery queryWithClassName:@"BarbecueSauce" predicate:pred];
 ```swift
 // Finds barbecue sauces that start with "Big Daddy".
 // Using PFQuery
-let query = PFQuery("BarbecueSauce")
+let query = PFQuery(className: "BarbecueSauce")
 query.whereKey("name", hasPrefix: "Big Daddy's")
 
 // Using NSPredicate
@@ -595,13 +604,15 @@ let query = PFQuery(className: "BarbecueSauce")
 query.whereKey("name", matchesText: "bbq")
 query.order(byAscending: "$score")
 query.selectKeys(["$score"])
-query.findObjectsInBackground { (objects, error) in
-  guard let objects = objects else {
-    return
-  }
-  objects.forEach { (object) in
-    print("Successfully retrieved \(object["$score"]) weight / rank.");
-  }
+query.findObjectsInBackground { (objects: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else if let objects = objects {
+        objects.forEach { (object) in
+            print("Successfully retrieved \(String(describing: object["$score"])) weight / rank.");
+        }
+    }
 }
 ```
 </div>
@@ -637,18 +648,26 @@ PFQuery *query = [PFQuery queryWithClassName:@"Comment" predicate:predicate];
 // Using PFQuery
 let query = PFQuery(className: "Comment")
 query.whereKey("post", equalTo: myPost)
-query.findObjectsInBackgroundWithBlock {
-    (comments: [PFObject]?, error: NSError?) -> Void in
-    // comments now contains the comments for myPost
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // comments now contains the comments for myPost
+    }
 }
 
 // Using NSPredicate
 let predicate = NSPredicate(format: "post = %@", myPost)
 let query = PFQuery(className: "Comment", predicate: predicate)
 
-query.findObjectsInBackgroundWithBlock {
-    (comments: [PFObject]?, error: NSError?) -> Void in
-    // comments now contains the comments for myPost
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // comments now contains the comments for myPost
+    }
 }
 ```
 </div>
@@ -703,9 +722,14 @@ let innerQuery = PFQuery(className: "Post")
 innerQuery.whereKeyExists("image")
 let query = PFQuery(className: "Comment")
 query.whereKey("post", matchesQuery: innerQuery)
-query.findObjectsInBackgroundWithBlock {
-    (comments: [PFObject]?, error: NSError?) -> Void in
-    // comments now contains the comments for posts with images
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // comments now contains the comments for posts with images
+
+    }
 }
 
 // Using NSPredicate
@@ -715,9 +739,14 @@ let innerQuery = PFQuery(className: "Post", predicate: innerPred)
 let pred = NSPredicate(format: "post IN %@", innerQuery)
 let query = PFQuery(className: "Comment", predicate: pred)
 
-query.findObjectsInBackgroundWithBlock {
-    (comments: [PFObject]?, error: NSError?) -> Void in
-    // comments now contains the comments for posts with images
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // comments now contains the comments for posts with images
+
+    }
 }
 ```
 </div>
@@ -751,10 +780,15 @@ PFQuery *query = [PFQuery queryWithClassName:@"Comment" predicate:pred];
 let innerQuery = PFQuery(className: "Post")
 innerQuery.whereKeyExists("image")
 let query = PFQuery(className: "Comment")
-query.whereKey("post", doesNotMatchQuery: innerQuery)
-query.findObjectsInBackgroundWithBlock {
-    (comments: [PFObject]?, error: NSError?) -> Void in
-    // comments now contains the comments for posts with images
+query.whereKey("post", doesNotMatch: innerQuery)
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // comments now contains the comments for posts without images
+
+    }
 }
 
 // Using NSPredicate
@@ -764,9 +798,14 @@ let innerQuery = PFQuery(className: "Post", predicate: innerPred)
 let pred = NSPredicate(format: "NOT (post IN %@)", innerQuery)
 let query = PFQuery(className: "Comment", predicate: pred)
 
-query.findObjectsInBackgroundWithBlock {
-    (comments: [PFObject]?, error: NSError?) -> Void in
-    // comments now contains the comments for posts with images
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // comments now contains the comments for posts without images
+
+    }
 }
 ```
 </div>
@@ -797,10 +836,10 @@ query.limit = 10;
 }];
 ```
 ```swift
-var query = PFQuery(className:"Comment")
+let query = PFQuery(className:"Comment")
 
 // Retrieve the most recent ones
-query.orderByDescending("createdAt")
+query.order(byDescending: "createdAt")
 
 // Only retrieve the last ten
 query.limit = 10
@@ -808,18 +847,20 @@ query.limit = 10
 // Include the post data with each comment
 query.includeKey("post")
 
-query.findObjectsInBackgroundWithBlock {
-  (comments: [PFObject]?, error: NSError?) -> Void in
+query.findObjectsInBackground { (comments: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else if let comments = comments {
+        // Comments now contains the last ten comments, and the "post" field
+        // has been populated. For example:
+        for comment in comments {
+            // This does not require a network access.
+            let post = comment["post"] as? PFObject
+            print("retrieved related post: \(String(describing: post))")
+        }
 
-  // Comments now contains the last ten comments, and the "post" field
-  // has been populated. For example:
-  if let comments = comments as? [PFObject] {
-      for comment in comments {
-          // This does not require a network access.
-          var post = comment["post"] as? PFObject
-          print("retrieved related post: \(post)")
-      }
-  }
+    }
 }
 ```
 </div>
@@ -855,18 +896,18 @@ If you have enabled the local datastore by calling `[Parse enableLocalDatastore]
 }];
 ```
 ```swift
+let query = PFQuery(className:"Comment")
 query.fromLocalDatastore()
-query.findObjectsInBackground().continueWithBlock({
-  (task: BFTask?) -> AnyObject! in
-  if let error = task?.error {
-      // There was an error.
-      return task
-  }
+query.findObjectsInBackground().continueWith { (task: BFTask<NSArray>) -> Any? in
+    if task.error != nil {
+        // There was an error.
+        return task
+    }
 
-  // Results were successfully found from the local datastore.
+    // Results were successfully found from the local datastore.
 
-  return task
-})
+    return task
+}
 ```
 </div>
 
@@ -893,17 +934,17 @@ query.cachePolicy = kPFCachePolicyNetworkElseCache;
 }];
 ```
 ```swift
-var query = PFQuery(className:"GameScore")
-query.cachePolicy = .CacheElseNetwork
-query.findObjectsInBackgroundWithBlock {
-  (objects: [PFObject]?, error: NSError?) -> Void in
-  if error == nil {
-    // Results were successfully found, looking first on the
-    // network and then on disk.
-  } else {
-    // The network was inaccessible and we have no cached data for
-    // this query.
-  }
+let query = PFQuery(className:"GameScore")
+query.cachePolicy = .cacheElseNetwork
+query.findObjectsInBackground { (objects: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The network was inaccessible and we have no cached data for
+        // this query.
+        print(error.localizedDescription)
+    } else {
+        // Results were successfully found, looking first on the
+        // network and then on disk.
+    }
 }
 ```
 </div>
@@ -925,7 +966,7 @@ If you need to control the cache's behavior, you can use methods provided in PFQ
 BOOL isInCache = [query hasCachedResult];
 ```
 ```swift
-let isInCache = query.hasCachedResult()
+let isInCache = query.hasCachedResult
 ```
 *   Remove any cached results for a query with:
 <div class="language-toggle" markdown="1">
@@ -967,13 +1008,15 @@ PFQuery *query = [PFQuery queryWithClassName:@"GameScore"];
 }];
 ```
 ```swift
-var query = PFQuery(className:"GameScore")
+let query = PFQuery(className:"GameScore")
 query.whereKey("playerName", equalTo:"Sean Plott")
-query.countObjectsInBackgroundWithBlock {
-  (count: Int32, error: NSError?) -> Void in
-  if error == nil {
-    print("Sean has played \(count) games")
-  }
+query.countObjectsInBackground { (count: Int32, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        print("Sean has played \(count) games")
+    }
 }
 ```
 </div>
@@ -997,18 +1040,20 @@ PFQuery *query = [PFQuery orQueryWithSubqueries:@[fewWins,lotsOfWins]];
 }];
 ```
 ```swift
-var lotsOfWins = PFQuery(className:"Player")
+let lotsOfWins = PFQuery(className:"Player")
 lotsOfWins.whereKey("wins", greaterThan:150)
 
-var fewWins = PFQuery(className:"Player")
+let fewWins = PFQuery(className:"Player")
 fewWins.whereKey("wins", lessThan:5)
 
-var query = PFQuery.orQueryWithSubqueries([lotsOfWins, fewWins])
-query.findObjectsInBackgroundWithBlock {
-  (results: [PFObject]?, error: NSError?) -> Void in
-  if error == nil {
-    // results contains players with lots of wins or only a few wins.
-  }
+let query = PFQuery.orQuery(withSubqueries: [lotsOfWins, fewWins])
+query.findObjectsInBackground { (results: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else {
+        // results contains players with lots of wins or only a few wins.
+    }
 }
 ```
 </div>
@@ -1034,13 +1079,14 @@ PFQuery *query = [Armor query];
 ```
 ```swift
 let query = Armor.query()
-query.whereKey("rupees", lessThanOrEqualTo: PFUser.currentUser()["rupees"])
-query.findObjectsInBackgroundWithBlock { (objects: [PFObject]?, error: NSError?) -> Void in
-  if error == nil {
-    if let objects = objects as? [Armor], firstArmor = objects.first {
-      //...
+query.whereKey("rupees", lessThanOrEqualTo: PFUser.current()?["rupees"] as Any)
+query.findObjectsInBackground { (objects: [PFObject]?, error: Error?) in
+    if let error = error {
+        // The request failed
+        print(error.localizedDescription)
+    } else if let objects = objects as? [Armor], let firstArmor = objects.first {
+       //...
     }
-  }
 }
 ```
 </div>

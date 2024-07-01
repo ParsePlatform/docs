@@ -4,6 +4,8 @@ Push Notifications are a great way to keep your users engaged and informed about
 
 If you haven't installed the SDK yet, please [head over to the Push QuickStart]({{ site.baseUrl }}/parse-server/guide/#push-notifications-quick-start) to get our SDK up and running.
 
+Please note that client push is not available with Parse Server due to it being a significant security risk, it is recommended that to trigger push notifications from your iOS app you run a cloud function that sends the push using the `masterKey`. If you must use client push, you could fork Parse Server and enable it or alternatively [Back4App](https://www.back4app.com) offer it as an option for testing purposes only.
+
 ## Setting Up Push
 
 If you want to start using push, start by completing the [Push Notifications QuickStart]({{ site.baseUrl }}/parse-server/guide/#push-notifications-quick-start) to learn how to configure your app. Come back to this guide afterwards to learn more about the push features offered by Parse.
@@ -58,7 +60,7 @@ While it is possible to modify a `PFInstallation` just like you would a `PFObjec
 *   **`channels`**: An array of the channels to which a device is currently subscribed.
 *   **`badge`**: The current value of the icon badge for iOS/OS X apps. Changing this value on the `PFInstallation` will update the badge value on the app icon. Changes should be saved to the server so that they will be used for future badge-increment push notifications.
 *   **`installationId`**: Unique Id for the device used by Parse _(readonly)_.
-*   **`deviceType`**: The type of device, "ios", "osx", "android", "winrt", "winphone", "dotnet", or "embedded". On iOS and OS X devices, this field will be set to "ios" and "osx", respectively _(readonly)_.
+*   **`deviceType`**: The type of device, "ios", "tvos", "osx", "android", "winrt", "winphone", "dotnet", or "embedded". On iOS, tvOS and OS X devices, this field will be set to "ios", "tvos" and "osx", respectively _(readonly)_.
 *   **`deviceToken`**: The Apple generated token used for iOS/OS X devices. On Android devices, this is the token used by FCM to keep track of registration ID _(readonly)_.
 *   **`appName`**: The display name of the client application to which this installation belongs. In iOS/OS X, this value is obtained from `kCFBundleNameKey`. This value is synchronized every time a `PFInstallation` object is saved from the device _(readonly)_.
 *   **`appVersion`**: The version string of the client application to which this installation belongs. In iOS/OS X, this value is obtained from `kCFBundleVersionKey`. This value is synchronized every time a `PFInstallation` object is saved from the device _(readonly)_.
@@ -75,13 +77,9 @@ The Parse SDK will avoid making unnecessary requests. If a `PFInstallation` is s
 
 There are two ways to send push notifications using Parse: [channels](#using-channels) and [advanced targeting](#using-advanced-targeting). Channels offer a simple and easy to use model for sending pushes, while advanced targeting offers a more powerful and flexible model. Both are fully compatible with each other and will be covered in this section.
 
-Sending notifications is often done from the Parse.com push console, the [REST API]({{ site.baseUrl }}/rest/guide/#sending-pushes) or from [Cloud Code]({{ site.baseUrl }}/js/guide/#sending-pushes). However, push notifications can also be triggered by the existing client SDKs. If you decide to send notifications from the client SDKs, you will need to set **Client Push Enabled** in the Push Notifications settings of your Parse app.
+Sending notifications is often done from the Parse Dashboard push console, the [REST API]({{ site.baseUrl }}/rest/guide/#sending-pushes) or from [Cloud Code]({{ site.baseUrl }}/js/guide/#sending-pushes).
 
-However, be sure you understand that enabling Client Push can  lead to a security vulnerability in your app, as outlined [on our blog](http://blog.parse.com/2014/09/03/the-dangerous-world-of-client-push/).  We recommend that you enable Client Push for testing purposes only,  and move your push notification logic into Cloud Code  when your app is ready to go into production.
-
-<img alt="Configuring push client settings" data-echo="{{ '/assets/images/client_push_settings.png' | prepend: site.baseurl }}"/>
-
-You can view your past push notifications on the Parse.com push console for up to 30 days after creating your push.  For pushes scheduled in the future, you can delete the push on the push console as long as no sends have happened yet. After you send the push, the push console shows push analytics graphs.
+You can view your past push notifications on the Parse Dashboard push console for up to 30 days after creating your push. For pushes scheduled in the future, you can delete the push on the push console as long as no sends have happened yet. After you send the push, the push console shows push analytics graphs.
 
 ### Using Channels
 
@@ -141,50 +139,6 @@ let subscribedChannels = PFInstallation.currentInstallation().channels
 
 If you plan on changing your channels from Cloud Code or the data browser, note that you'll need to call some form of `fetch` prior to this line in order to get the most recent channels.
 
-#### Sending Pushes to Channels
-
-In the iOS/OS X SDK, the following code can be used to alert all subscribers of the "Giants" channel that their favorite team just scored. This will display a notification center alert to iOS/OS X users and a system tray notification to Android users.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-// Send a notification to all devices subscribed to the "Giants" channel.
-PFPush *push = [[PFPush alloc] init];
-[push setChannel:@"Giants"];
-[push setMessage:@"The Giants just scored!"];
-[push sendPushInBackground];
-```
-```swift
-// Send a notification to all devices subscribed to the "Giants" channel.
-let push = PFPush()
-push.setChannel("Giants")
-push.setMessage("The Giants just scored!")
-push.sendPushInBackground()
-```
-</div>
-
-If you want to target multiple channels with a single push notification, you can use an `NSArray` of channels.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
-PFPush *push = [[PFPush alloc] init];
-
-// Be sure to use the plural 'setChannels'.
-[push setChannels:channels];
-[push setMessage:@"The Giants won against the Mets 2-3."];
-[push sendPushInBackground];
-```
-```swift
-let channels = [ "Giants", "Mets" ];
-let push = PFPush()
-
-// Be sure to use the plural 'setChannels'.
-push.setChannels(channels)
-push.setMessage("The Giants won against the Mets 2-3.")
-push.sendPushInBackground()
-```
-</div>
-
 ### Using Advanced Targeting
 
 While channels are great for many applications, sometimes you need more precision when targeting the recipients of your pushes. Parse allows you to write a query for any subset of your `Installation` objects using the [querying API](#queries) and to send them a push.
@@ -231,352 +185,11 @@ installation.saveInBackground()
 ```
 </div>
 
-#### Sending Pushes to Queries
-
-Once you have your data stored on your `Installation` objects, you can use a `PFQuery` to target a subset of these devices. `Installation` queries work just like any other [Parse query](#queries), but we use the special static method `[PFInstallation query]` to create it. We set this query on our `PFPush` object, before sending the notification.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-// Create our Installation query
-PFQuery *pushQuery = [PFInstallation query];
-[pushQuery whereKey:@"injuryReports" equalTo:@YES];
-
-// Send push notification to query
-PFPush *push = [[PFPush alloc] init];
-[push setQuery:pushQuery]; // Set our Installation query
-[push setMessage:@"Willie Hayes injured by own pop fly."];
-[push sendPushInBackground];
-```
-```swift
-// Create our Installation query
-let pushQuery = PFInstallation.query()
-pushQuery.whereKey("injuryReports", equalTo: true)
-
-// Send push notification to query
-let push = PFPush()
-push.setQuery(pushQuery) // Set our Installation query
-push.setMessage("Willie Hayes injured by own pop fly.")
-push.sendPushInBackground()
-```
-</div>
-
-We can even use channels with our query. To send a push to all subscribers of the "Giants" channel but filtered by those who want score update, we can do the following:
-
-<div class="language-toggle" markdown="1">
-```objective_c
-// Create our Installation query
-PFQuery *pushQuery = [PFInstallation query];
-[pushQuery whereKey:@"channels" equalTo:@"Giants"]; // Set channel
-[pushQuery whereKey:@"scores" equalTo:@YES];
-
-// Send push notification to query
-PFPush *push = [[PFPush alloc] init];
-[push setQuery:pushQuery];
-[push setMessage:@"Giants scored against the A's! It's now 2-2."];
-[push sendPushInBackground];
-```
-```swift
-// Create our Installation query
-let pushQuery = PFInstallation.query()
-pushQuery.whereKey("channels", equalTo:"Giants") // Set channel
-pushQuery.whereKey("scores", equalTo:true)
-
-// Send push notification to query
-let push = PFPush()
-push.setQuery(pushQuery) // Set our Installation query
-push.setMessage("Giants scored against the A's! It's now 2-2.")
-push.sendPushInBackground()
-```
-</div>
-
-If we store relationships to other objects in our `Installation` class, we can also use those in our query. For example, we could send a push notification to all users near a given location like this.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-// Find users near a given location
-PFQuery *userQuery = [PFUser query];
-[userQuery whereKey:@"location"    nearGeoPoint:stadiumLocation withinMiles:@1]
-
-// Find devices associated with these users
-PFQuery *pushQuery = [PFInstallation query];
-[pushQuery whereKey:@"user" matchesQuery:userQuery];
-
-// Send push notification to query
-PFPush *push = [[PFPush alloc] init];
-[push setQuery:pushQuery]; // Set our Installation query
-[push setMessage:@"Free hotdogs at the Parse concession stand!"];
-[push sendPushInBackground];
-```
-```swift
-// Find users near a given location
-let userQuery = PFUser.query()
-userQuery.whereKey("location", nearGeoPoint: stadiumLocation, withinMiles: 1)
-
-// Find devices associated with these users
-let pushQuery = PFInstallation.query()
-pushQuery.whereKey("user", matchesQuery: userQuery)
-
-// Send push notification to query
-let push = PFPush()
-push.setQuery(pushQuery) // Set our Installation query
-push.setMessage("Free hotdogs at the Parse concession stand!")
-push.sendPushInBackground()
-```
-</div>
-
-## Sending Options
-
-Push notifications can do more than just send a message. On iOS/OS X, pushes can also include the sound to be played, the badge number to display as well as any custom data you wish to send. An expiration date can also be set for the notification in case it is time sensitive.
-
-### Customizing your Notifications
-
-If you want to send more than just a message, you will need to use an `NSDictionary` to package all of the data. There are some reserved fields that have a special meaning.
-
-*   **`alert`**:   the notification's message.
-*   **`badge`**: _(iOS/OS X only)_   the value indicated in the top right corner of the app icon.   This can be set to a value   or to `Increment` in order to increment the current value by 1.
-*   **`sound`**: _(iOS/OS X only)_   the name of a sound file in the application bundle.
-*   **`content-available`**: _(iOS only)_ If you are a writing an app using the Remote Notification Background Mode [ introduced in iOS7](https://developer.apple.com/library/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS7.html#//apple_ref/doc/uid/TP40013162-SW10) (a.k.a. "Background Push"), set this value to 1 to trigger a background download.
-*   **`category`**: _(iOS only)_ the identifier of the [`UNNotification​Category`](https://developer.apple.com/reference/usernotifications/unnotificationcategory) for this push notification.
-*   **`uri`**: _(Android only)_   an optional field that contains a URI. When the   notification is opened, an `Activity` associate   with opening the URI is launched.
-*   **`title`**: _(Android, Windows 8, and Windows Phone 8 only)_   the value displayed in the Android system tray or Windows toast notification.
-
-For example, to send a notification that increases the current badge number by 1 and plays a custom sound, you can do the following:
-
-<div class="language-toggle" markdown="1">
-```objective_c
-NSDictionary *data = @{
-  @"alert" : @"The Mets scored! The game is now tied 1-1!",
-  @"badge" : @"Increment",
-  @"sounds" : @"cheering.caf"
-};
-PFPush *push = [[PFPush alloc] init];
-[push setChannels:@[ @"Mets" ]];
-[push setData:data];
-[push sendPushInBackground];
-```
-```swift
-let data = [
-  "alert" : "The Mets scored! The game is now tied 1-1!",
-  "badge" : "Increment",
-  "sounds" : "cheering.caf"
-]
-let push = PFPush()
-push.setChannels(["Mets"])
-push.setData(data)
-push.sendPushInBackground()
-```
-</div>
-
-It is also possible to specify your own data in this dictionary. As we'll see in the [Receiving Notifications](#receiving-pushes) section, you will have access to this data only when the user opens your app via the notification. This can be useful for displaying a different view controller when a user opens certain notifications.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-NSDictionary *data = @{
-  @"alert" : @"Ricky Vaughn was injured in last night's game!",
-  @"name" : @"Vaughn",
-  @"newsItem" : @"Man bites dog"
-};
-PFPush *push = [[PFPush alloc] init];
-[push setQuery:injuryReportsQuery];
-[push setChannel:@"Indians"];
-[push setData:data];
-[push sendPushInBackground];
-```
-```swift
-let data = [
-  "alert" : "Ricky Vaughn was injured in last night's game!",
-  "name" : "Vaughn",
-  "newsItem" : "Man bites dog"
-]
-let push = PFPush()
-push.setQuery(injuryReportsdata)
-push.setChannel("Indians")
-push.setData(data)
-push.sendPushInBackground()
-```
-</div>
-
-Whether your push notifications increment the app's badge or set it to a specific value, your app will eventually need to clear its badge. This is covered in [Clearing the Badge](#receiving-pushes).
-
-### Setting an Expiration Date
-
-When a user's device is turned off or not connected to the internet, push notifications cannot be delivered. If you have a time sensitive notification that is not worth delivering late, you can set an expiration date. This avoids needlessly alerting users of information that may no longer be relevant.
-
-There are two methods provided by the `PFPush` class to allow setting an expiration date for your notification. The first is `expireAtDate:` which simply takes an `NSDate` specifying when Parse should stop trying to send the notification.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-// Create date object for tomorrow
-NSDateComponents *comps = [[NSDateComponents alloc] init];
-[comps setYear:2015];
-[comps setMonth:8];
-[comps setDay:14];
-NSCalendar *gregorian =
-  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-NSDate *date = [gregorian dateFromComponents:comps];
-
-// Send push notification with expiration date
-PFPush *push = [[PFPush alloc] init];
-[push expireAtDate:date];
-[push setQuery:everyoneQuery];
-[push setMessage:@"Season tickets on sale until August 8th!"];
-[push sendPushInBackground];
-```
-```swift
-// Create date object for tomorrow
-let comps = NSDateComponents()
-comps.year = 2015
-comps.month = 8
-comps.day = 14
-let gregorian = NSCalendar(calendarIdentifier: NSGregorianCalendar)
-let date = gregorian!.dateFromComponents(comps);
-
-// Send push notification with expiration
-let push = PFPush()
-push.expireAtDate(date)
-push.setQuery(everyoneQuery)
-push.setMessage("Season tickets on sale until August 8th!")
-push.sendPushInBackground()
-```
-</div>
-
-There is however a caveat with this method. Since device clocks are not guaranteed to be accurate, you may end up with inaccurate results. For this reason, the `PFPush` class also provides the `expireAfterTimeInterval:` method which accepts an `NSTimeInterval` object. The notification will expire after the specified interval has elapsed.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-// Create time interval
-NSTimeInterval interval = 60*60*24*7; // 1 week
-
-// Send push notification with expiration interval
-PFPush *push = [[PFPush alloc] init];
-[push expireAfterTimeInterval:interval];
-[push setQuery:everyoneQuery];
-[push setMessage:@"Season tickets on sale until next week!"];
-[push sendPushInBackground];
-```
-```swift
-// Create time interval
-let interval = 60*60*24*7; // 1 week
-
-// Send push notification with expiration interval
-
-let push = PFPush()
-push.expireAfterTimeInterval(interval)
-push.setQuery(everyoneQuery)
-push.setMessage("Season tickets on sale until next week!")
-push.sendPushInBackground()
-```
-</div>
-
-### Targeting by Platform
-
-If you build a cross platform app, it is possible you may only want to target devices of a particular operating system. Advanced Targeting allow you to filter which of these devices are targeted.
-
-The following example would send a different notification to Android, iOS, and Windows users.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-PFQuery *query = [PFInstallation query];
-[query whereKey:@"channels" equalTo:@"suitcaseOwners"];
-
-// Notification for Android users
-[query whereKey:@"deviceType" equalTo:@"android"];
-PFPush *androidPush = [[PFPush alloc] init];
-[androidPush setMessage:@"Your suitcase has been filled with tiny robots!"];
-[androidPush setQuery:query];
-[androidPush sendPushInBackground];
-
-// Notification for iOS users
-[query whereKey:@"deviceType" equalTo:@"ios"];
-PFPush *iOSPush = [[PFPush alloc] init];
-[iOSPush setMessage:@"Your suitcase has been filled with tiny apples!"];
-[iOSPush setChannel:@"suitcaseOwners"];
-[iOSPush setQuery:query];
-[iOSPush sendPushInBackground];
-
-// Notification for Windows 8 users
-[query whereKey:@"deviceType" equalTo:@"winrt"];
-PFPush *winPush = [[PFPush alloc] init];
-[winPush setMessage:@"Your suitcase has been filled with tiny glass!"];
-[winPush setQuery:query];
-[winPush sendPushInBackground];
-
-// Notification for Windows Phone 8 users
-[query whereKey:@"deviceType" equalTo:@"winphone"];
-PFPush *wpPush = [[PFPush alloc] init];
-[wpPush setMessage:@"Your suitcase is very hip; very metro."];
-[wpPush setQuery:query];
-[wpPush sendPushInBackground];
-```
-```swift
-let query = PFInstallation.query()
-if let query = query {
-    query.whereKey("channels", equalTo: "suitcaseOwners")
-
-    // Notification for Android users
-    query.whereKey("deviceType", equalTo: "android")
-    let androidPush = PFPush()
-    androidPush.setMessage("Your suitcase has been filled with tiny robots!")
-    androidPush.setQuery(query)
-    androidPush.sendPushInBackground()
-
-    // Notification for iOS users
-    query.whereKey("deviceType", equalTo: "ios")
-    let iOSPush = PFPush()
-    iOSPush.setMessage("Your suitcase has been filled with tiny apples!")
-    iOSPush.setChannel("suitcaseOwners")
-    iOSPush.setQuery(query)
-    iOSPush.sendPushInBackground()
-
-    // Notification for Windows 8 users
-    query.whereKey("deviceType", equalTo: "winrt")
-    let winPush = PFPush()
-    winPush.setMessage("Your suitcase has been filled with tiny glass!")
-    winPush.setQuery(query)
-    winPush.sendPushInBackground()
-
-    // Notification for Windows Phone 8 users
-    query.whereKey("deviceType", equalTo: "winphone")
-    let wpPush = PFPush()
-    wpPush.setMessage("Your suitcase is very hip; very metro.")
-    wpPush.setQuery(query)
-    wpPush.sendPushInBackground()
-}
-```
-</div>
-
-## Scheduling Pushes
-
-Sending scheduled push notifications is not currently supported by the iOS or OS X SDKs. Take a look at the [REST API]({{ site.baseUrl }}/rest/guide/#scheduling-pushes), [JavaScript SDK]({{ site.baseUrl }}/js/guide/#scheduling-pushes) or the Parse.com push console.
-
 ## Receiving Pushes
 
-As we saw in the [Customizing Your Notification](#sending-options) section, it is possible to send arbitrary data along with your notification message. We can use this data to modify the behavior of your app when a user opens a notification. For example, upon opening a notification saying that a friend commented on a user's picture, it would be nice to display this picture.
+It is possible to send arbitrary data along with your notification message, which is explained in the [Sending Options](https://docs.parseplatform.org/js/guide/#sending-options) section in the JavaScript docs. We can use this data to modify the behavior of your app when a user opens a notification. For example, upon opening a notification saying that a friend commented on a user's picture, it would be nice to display this picture. This could be done by sending the `objectId` of the picture in the push payload and then fetching the image once the user opens the notification.
 
 Due to the package size restrictions imposed by Apple, you need to be careful in managing the amount of extra data sent, since it will cut down on the maximum size of your message. For this reason, it is recommended that you keep your extra keys and values as small as possible.
-
-<div class="language-toggle" markdown="1">
-```objective_c
-NSDictionary *data = @{
-  @"alert" : @"James commented on your photo!",
-  @"p" : @"vmRZXZ1Dvo" // Photo's object id
-};
-PFPush *push = [[PFPush alloc] init];
-[push setQuery:photoOwnerQuery];
-[push setData:data];
-[push sendPushInBackground];
-```
-```swift
-let data = [
-  "alert" : "James commented on your photo!",
-  "p" : "vmRZXZ1Dvo" // Photo's object id
-]
-let push = PFPush()
-push.setQuery(photoOwnerQuery)
-push.setData(data)
-push.sendPushInBackground()
-```
-</div>
 
 ### Responding to the Payload
 
@@ -678,7 +291,7 @@ You can read more about handling push notifications in Apple's [Local and Push N
 
 ### Tracking Pushes and App Opens
 
-To track your users' engagement over time and the effect of push notifications, we provide some hooks in the `PFAnalytics` class. You can view the open rate for a specific push notification on the Parse.com push console. You can also view overall app open and push open graphs are on the Parse analytics console.  Our analytics graphs are rendered in real time, so you can easily verify that your application is sending the correct analytics events before your next release.
+To track your users' engagement over time and the effect of push notifications, we provide some hooks in the `PFAnalytics` class. You can view the open rate for a specific push notification on the Parse Dashboard push console. You can also view overall app open and push open graphs are on the Parse analytics console.  Our analytics graphs are rendered in real time, so you can easily verify that your application is sending the correct analytics events before your next release.
 
 This section assumes that you've already set up your application to [save the Installation object](#installations). Push open tracking only works when your application's devices are associated with saved `Installation` objects.
 
@@ -781,7 +394,7 @@ To track analytics around local notifications, note that `application:didReceive
 
 #### Clearing the Badge
 
-A good time to clear your app's badge is usually when your app is opened. Setting the badge property on the current installation will update the application icon badge number and ensure that the latest badge value  will be persisted to the server on the next save. All you need to do is:
+A good time to clear your app's badge is usually when your app is opened. Setting the badge property on the current installation will update the application icon badge number and ensure that the latest badge value will be persisted to the server on the next save. All you need to do is:
 
 <div class="language-toggle" markdown="1">
 ```objective_c
@@ -822,7 +435,7 @@ For each push campaign sent through the Parse web push console, you can allocate
 
 After you send the push, you can come back to the push console to see in real time which version resulted in more push opens, along with other metrics such as statistical confidence interval. It's normal for the number of recipients in each group to be slightly different because some devices that we had originally allocated to that experiment group may have uninstalled the app. It's also possible for the  random group assignment to be slightly uneven when the test audience size is small. Since we calculate open rate separately for each group based on recipient count, this should not significantly affect your experiment results.
 
-<img alt="Getting experiment results" data-echo="{{ '/assets/images/experiment_results_.png' | prepend: site.baseurl }}"/>
+<img alt="Getting experiment results" data-echo="{{ '/assets/images/experiment_results.png' | prepend: site.baseurl }}"/>
 
 If you are happy with the way one message performed, you can send that to the rest of your app's devices (i.e. the “Launch Group”). This step only applies to A/B tests where you vary the message.
 
@@ -873,37 +486,9 @@ If you're unsure about the answer to any of the above questions, read on!
 
 ### Confirm that the push campaign was created
 
-Having everything set up correctly in your Parse app won't help if your request to send a push notification does not reach Parse. The first step in debugging a push issue is to confirm that the push campaign is listed in your push logs. You can find these logs by visiting your app's [Dashboard](https://github.com/parse-community/parse-dashboard) and clicking on Push.
+Having everything set up correctly in your Parse app won't help if your request to send a push notification does not reach Parse. The first step in debugging a push issue is to confirm that the push campaign is listed in your push logs. You can find these logs by visiting your app's Dashboard and clicking on Push.
 
-If the push notification campaign is not showing up on that list, the issue is quite simple to resolve. Go back to your push notification sending code and make sure to check for any error responses. If you're using any of the client SDKs, make sure to listen for and catch any errors that may be returned. For example, you could log errors like so:
-
-<div class="language-toggle" markdown="1">
-```objective_c
-[push sendPushInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-  if (success) {
-    NSLog(@"The push campaign has been created.");
-  } else if (error.code == kPFErrorPushMisconfigured) {
-    NSLog(@"Could not send push. Push is misconfigured: %@", error.description);
-  } else {
-    NSLog(@"Error sending push: %@", error.description);
-  }
-}];
-```
-```swift
-push.sendPushInBackgroundWithBlock {
-    (success: Bool , error: NSError?) -> Void in
-    if (success) {
-        print("The push campaign has been created.");
-    } else if (error!.code == 112) {
-        print("Could not send push. Push is misconfigured: \(error!.description).");
-    } else {
-        print("Error sending push: \(error!.description).");
-    }
-}
-```
-</div>
-
-Please note that SDKs that use a Client Key, such as the iOS/OS X SDKs, can only send push notifications if Client Push is enabled in your Parse app's Push Notification settings. Otherwise, you'll only be able to send pushes from the web console, the REST API, or by using the JavaScript SDK from Cloud Code. We strongly encourage developers to turn off Client Push before releasing their app publicly unless your use case allows for any amount of arbitrary pushes to be sent by any of your users. You can read our security guide for more information.
+If the push notification campaign is not showing up on that list, the issue is quite simple to resolve. Go back to your push notification sending code and make sure to check for any error responses.
 
 ### Verify your Targeting
 

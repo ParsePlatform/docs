@@ -6,24 +6,25 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-name: Parse Open Source Docs
+name: Parse Platform Docs
 title: Parse Docs
-email: community@parse.com
-description: The open source GitHub page for the Parse platform.
+email: community@parseplatform.org
+description: The open source docs for the Parse platform SDKs & other guides.
 url: "http://docs.parseplatform.org" # the base hostname & protocol for your site
 repository: parse-community/docs
-facebook_username: parseit
-twitter_username:  parseit
+twitter_username:  parseplatform
 github_username:   parseplatform
-stackoverflow_tag: parse.com
+stackoverflow_tag: parse-platform
 serverfault_tag:   parse
-support_url: https://www.parse.com/help
+support_url: https://community.parseplatform.org
 apis:
   osx: https://parseplatform.org/Parse-SDK-iOS-OSX/api/
   android: https://parseplatform.org/Parse-SDK-Android/api/
   js: https://parseplatform.org/Parse-SDK-JS/api/
-  php: https://parseplatform.org/parse-php-sdk/namespaces/Parse.html
+  php: https://parseplatform.org/parse-php-sdk/
   dotnet: https://parseplatform.org/Parse-SDK-dotNET/api/
+  flutter: https://parseplatform.org/Parse-SDK-Flutter/flutter/flutter_parse_sdk_flutter/flutter_parse_sdk_flutter-library.html
+  dart: https://parseplatform.org/Parse-SDK-Flutter/dart/flutter_parse_sdk/flutter_parse_sdk-library.html
   parse-server: https://parseplatform.org/parse-server/api/
 
 # Build settings

@@ -14,7 +14,7 @@ Without having to implement any client-side logic, you can view real-time graphs
 Say your app offers search functionality for apartment listings, and you want to track how often the feature is used, with some additional metadata.
 
 ```javascript
-var dimensions = {
+const dimensions = {
   // Define ranges to bucket data points into meaningful segments
   priceRange: '1000-1500',
   // Did the user filter the query?
@@ -29,7 +29,7 @@ Parse.Analytics.track('search', dimensions);
 `Parse.Analytics` can even be used as a lightweight error tracker &mdash; simply invoke the following and you'll have access to an overview of the rate and frequency of errors, broken down by error code, in your application:
 
 ```javascript
-var codeString = '' + error.code;
+const codeString = '' + error.code;
 Parse.Analytics.track('error', { code: codeString });
 ```
 

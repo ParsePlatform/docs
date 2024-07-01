@@ -125,6 +125,18 @@
                 }
             }
 
+            div{
+                position: relative;
+                display:block;
+                text-decoration: none;
+                padding: $docs-platform-link-padding;
+                border-left: $docs-platform-uniform-border;
+                border-right: $docs-platform-uniform-border;
+                font-size: 1.4rem;
+
+                transition: background-color 150ms ease;                
+            }
+
             & + li{ border-top: $docs-platform-uniform-border; }
         }
     }
@@ -168,6 +180,16 @@
         width: 24px;
         height: 24px;
     }
+    svg.icon-flutter{
+        fill: $flutterPlatform;
+        width: 23px;
+        height: 24px;
+    }
+    svg.icon-dart{
+        fill: $dartPlatform;
+        width: 23px;
+        height: 24px;
+    }
     svg.icon-js{
         fill: $jsPlatform;
         width: 33px;
@@ -207,6 +229,11 @@
         fill: $serverPlatform;
         width: 25px;
         height: 25px;
+    }
+    svg.icon-graphql{
+        fill: $graphqlPlatform;
+        width: 25px;
+        height: 24px;
     }
 
 

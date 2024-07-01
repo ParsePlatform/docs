@@ -79,7 +79,7 @@ obj.save().then(function(obj) {
 Promises are a little bit magical, in that they let you chain them without nesting. If a callback for a promise returns a new promise, then the first one will not be resolved until the second one is. This lets you perform multiple actions without incurring the pyramid code you would get with callbacks.
 
 ```javascript
-var query = new Parse.Query("Student");
+const query = new Parse.Query("Student");
 query.descending("gpa");
 query.find().then(function(students) {
   students[0].set("valedictorian", true);
@@ -144,7 +144,7 @@ Parse.User.logIn("user", "pass").then(function(user) {
 Generally, developers consider a failing promise to be the asynchronous equivalent to throwing an exception. In fact, if a callback passed to `then` throws an error, the promise returned will fail with that error. If any Promise in a chain returns an error, all of the success callbacks after it will be skipped until an error callback is encountered. The error callback can transform the error, or it can handle it by returning a new Promise that isn't rejected. You can think of rejected promises kind of like throwing an exception. An error callback is like a catch block that can handle the error or rethrow it.
 
 ```javascript
-var query = new Parse.Query("Student");
+const query = new Parse.Query("Student");
 query.descending("gpa");
 query.find().then(function(students) {
   students[0].set("valedictorian", true);
@@ -224,7 +224,7 @@ query.find().then(function(results) {
 With these tools, it's easy to make your own asynchronous functions that return promises. For example, you can make a promisified version of `setTimeout`.
 
 ```javascript
-var delay = function(millis) {
+const delay = function(millis) {
   return new Promise((resolve) => {
     setTimeout(resolve, millis);
   });

@@ -24,6 +24,11 @@
 
   <meta name="theme-color" content="#5298fc">
   <script>if(Function('/*@cc_on return document.documentMode===10@*/')()){document.documentElement.className+=' ie10';}</script>
+  <script>
+    if (window.location.protocol !== "https:" && window.location.hostname !== "127.0.0.1") window.location.protocol = "https:"; // force https
+    var gitJson = {{ site.github.public_repositories | jsonify }};
+  </script>
+  <script src="https://parseplatform.org/js/links.js"></script>
 
   <meta name="csrf-param" content="authenticity_token">
   <meta name="csrf-token" content="KxDoKysxiXDIRV8VXwDYlQStDGzjbGZ24y6ZgQLYAsE=">
@@ -43,7 +48,7 @@
   <!-- CSS -->
   <!-- build:css -->
   <link rel="preconnect" href="{{ site.baseUrl }}">
-  
+
   {% if page.layout == "guide" %}
   <link href="{{ site.baseUrl }}/css/guide.css" rel="stylesheet" type="text/css"/>
   {% else %}

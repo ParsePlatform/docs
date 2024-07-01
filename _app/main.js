@@ -110,7 +110,7 @@ App.Views = {};
 			this._headerHeights = headerHeights;
 			this._sortedHeights = sortedHeights.sort(function(a,b) { return a - b; });
     },
-    
+
     findBestLink: function() {
       var fromTop = this.scrollContent.scrollTop;
 			// firefox doesn't like this so we fallback to window
@@ -244,7 +244,7 @@ App.Views = {};
       var self = this;
       $('.language-toggle').each(function(i, block) {
         $(block.children).each(function(i, node) {
-          // manually rendered 
+          // manually rendered
           var isOpt1 = false;
           var isOpt2 = false;
           var toggleTarget;
@@ -348,7 +348,7 @@ App.Views = {};
 			// create the TOC
 			this.scrollContent = document.getElementsByTagName('body')[0];
 
-      
+
       // add toggles to code blocks if necessary
       if (this.platform === "ios" || this.platform === "osx" || this.platform === "macos") {
         new App.Views.Docs.Toggle({
@@ -418,7 +418,9 @@ App.Views = {};
         const _mount      = localStorage.getItem('parse-server-custom-mount');
         const _protocol   = localStorage.getItem('parse-server-custom-protocol');
         const _appId      = localStorage.getItem('parse-server-custom-appid');
+        const _masterKey  = localStorage.getItem('parse-server-custom-masterkey');
         const _clientKey  = localStorage.getItem('parse-server-custom-clientkey');
+        const _restApiKey  = localStorage.getItem('parse-server-custom-restapikey');
 
         // set existing entries
         if (_url) {
@@ -437,9 +439,17 @@ App.Views = {};
           $(".custom-parse-server-appid").html(_appId);
           $("#parse-server-custom-appid").val(_appId);
         }
+        if (_masterKey) {
+          $(".custom-parse-server-masterkey").html(_masterKey);
+          $("#parse-server-custom-masterkey").val(_masterKey);
+        }
         if (_clientKey) {
           $(".custom-parse-server-clientkey").html(_clientKey);
           $("#parse-server-custom-clientkey").val(_clientKey);
+        }
+        if (_restApiKey) {
+          $(".custom-parse-server-restapikey").html(_restApiKey);
+          $("#parse-server-custom-restapikey").val(_restApiKey);
         }
       }
 
@@ -505,11 +515,26 @@ App.Views = {};
         }
       });
 
+      // set masterKey listener
+      $('#parse-server-custom-masterkey').keyup(function() {
+        var masterKey = $('#parse-server-custom-masterkey').val();
+        if(!masterKey.match(/^[^\s]+$/i)) {
+          // not a valid masterKey
+          return;
+        }
+        // encode any html
+        masterKey = masterKey.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        $(".custom-parse-server-masterkey").html(masterKey);
+        if (typeof(Storage) !== "undefined") {
+          localStorage.setItem('parse-server-custom-masterkey', masterKey);
+        }
+      });
+
       // set clientKey listener
       $('#parse-server-custom-clientkey').keyup(function() {
         var clientKey = $('#parse-server-custom-clientkey').val();
         if(!clientKey.match(/^[^\s]+$/i)) {
-          // not a valid appId
+          // not a valid clientKey
           return;
         }
         // encode any html
@@ -517,6 +542,21 @@ App.Views = {};
         $(".custom-parse-server-clientkey").html(clientKey);
         if (typeof(Storage) !== "undefined") {
           localStorage.setItem('parse-server-custom-clientkey', clientKey);
+        }
+      });
+
+      // set restApiKey listener
+      $('#parse-server-custom-restapikey').keyup(function() {
+        var restApiKey = $('#parse-server-custom-restapikey').val();
+        if(!restApiKey.match(/^[^\s]+$/i)) {
+          // not a valid restApiKey
+          return;
+        }
+        // encode any html
+        restApiKey = restApiKey.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        $(".custom-parse-server-restapikey").html(restApiKey);
+        if (typeof(Storage) !== "undefined") {
+          localStorage.setItem('parse-server-custom-restapikey', restApiKey);
         }
       });
 
@@ -543,12 +583,20 @@ App.Views = {};
         $("#parse-server-custom-appid").val(_default);
         localStorage.setItem('parse-server-custom-appid', _default);
 
+        _default = $("#parse-server-custom-masterkey").attr('defaultval');
+        $(".custom-parse-server-masterkey").html(_default);
+        $("#parse-server-custom-masterkey").val(_default);
+        localStorage.setItem('parse-server-custom-masterkey', _default);
+
         _default = $("#parse-server-custom-clientkey").attr('defaultval');
         $(".custom-parse-server-clientkey").html(_default);
         $("#parse-server-custom-clientkey").val(_default);
         localStorage.setItem('parse-server-custom-clientkey', _default);
 
-
+        _default = $("#parse-server-custom-restapikey").attr('defaultval');
+        $(".parse-server-custom-restapikey").html(_default);
+        $("#parse-server-custom-restapikey").val(_default);
+        localStorage.setItem('parse-server-custom-restapikey', _default);
       });
 
     },

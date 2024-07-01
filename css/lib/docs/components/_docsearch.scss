@@ -72,6 +72,12 @@ input {
     &.unity_docs_docsearch{
       background-color: $unityPlatform;
     }
+    &.flutter_docs_header{
+      background-color: $flutterPlatform;
+    }
+    &.dart_docs_header{
+      background-color: $dartPlatform;
+    }
     &.php_docs_docsearch{
       background-color: $phpPlatform;
     }
@@ -86,6 +92,9 @@ input {
     }
     &.rest_docs_docsearch{
       background-color: $restPlatform;
+    }
+    &.graphql_docs_docsearch{
+      background-color: $graphqlPlatform;
     }
 
     &:focus {

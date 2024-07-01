@@ -9,8 +9,10 @@ Note: Live Queries is supported only in [Parse Server](https://github.com/parse-
 
 ```javascript
 let query = new Parse.Query('Game');
-let subscription = query.subscribe();
+let subscription = await query.subscribe();
 ```
+
+* Since release `2.3.0` of Parse JS SDK, the `query.subscribe()` function returns a `Promise` that resolves to the subscription object. Previous releases return the subscription object directly and require you to write `let subscription = query.subscribe();` instead.
 
 The subscription you get is actually an event emitter. For more information on event emitter, check [here](https://nodejs.org/api/events.html). You'll get the LiveQuery events through this `subscription`. The first time you call subscribe, we'll try to open the WebSocket connection to the LiveQuery server for you.
 
@@ -170,7 +172,7 @@ let client = new LiveQueryClient({
 ```
 
 * `applicationId` is mandatory, it's the `applicationId` of your Parse app
-* `liveQueryServerURL` is mandatory, it's the URL of your LiveQuery server
+* `serverURL` is mandatory, it's the URL of your LiveQuery server
 * `javascriptKey` and `masterKey` are optional, they are used for verifying the `LiveQueryClient` when it tries to connect to the LiveQuery server. If you set them, they should match your Parse app. You can check LiveQuery protocol [here](https://github.com/parse-community/parse-server/wiki/Parse-LiveQuery-Protocol-Specification) for more details.
 
 ### Open

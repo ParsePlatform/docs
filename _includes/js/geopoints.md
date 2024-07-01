@@ -7,7 +7,7 @@ Parse allows you to associate real-world latitude and longitude coordinates with
 To associate a point with an object you first need to create a `Parse.GeoPoint`.  For example, to create a point with latitude of 40.0 degrees and -30.0 degrees longitude:
 
 ```javascript
-var point = new Parse.GeoPoint({latitude: 40.0, longitude: -30.0});
+const point = new Parse.GeoPoint({latitude: 40.0, longitude: -30.0});
 ```
 
 This point is then stored in the object as a regular field.
@@ -67,10 +67,10 @@ const pizzaPlacesInSF = query.find();
 It's also possible to query for the set of objects that are contained within a particular area.  To find the objects in a rectangular bounding box, add the `withinGeoBox` restriction to your `Parse.Query`.
 
 ```javascript
-var southwestOfSF = new Parse.GeoPoint(37.708813, -122.526398);
-var northeastOfSF = new Parse.GeoPoint(37.822802, -122.373962);
+const southwestOfSF = new Parse.GeoPoint(37.708813, -122.526398);
+const northeastOfSF = new Parse.GeoPoint(37.822802, -122.373962);
 
-var query = new Parse.Query(PizzaPlaceObject);
+const query = new Parse.Query(PizzaPlaceObject);
 query.withinGeoBox("location", southwestOfSF, northeastOfSF);
 const pizzaPlacesInSF = await query.find();
 ```

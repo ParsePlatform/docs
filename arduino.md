@@ -16,7 +16,6 @@ sections:
 - "arduino/push-notifications.md"
 - "arduino/analytics.md"
 - "arduino/cloud-code.md"
-- "arduino/sample-app.md"
 - "common/errors.md"
 
 ---

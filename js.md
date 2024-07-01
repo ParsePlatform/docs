@@ -18,6 +18,7 @@ sections:
 - "js/files.md"
 - "js/promises.md"
 - "js/geopoints.md"
+- "js/local-datastore.md"
 - "js/push-notifications.md"
 - "js/config.md"
 - "js/analytics.md"

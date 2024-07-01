@@ -13,7 +13,7 @@
  *            _\/\\\\\\\\\\\\/____/\\\/___\///\\\_\/\\\_____________\/\\\_
  *             _\////////////_____\///_______\///__\///______________\///__
  *
- *                       Parse.com (Docs) Sass Library
+ *                       Parse Docs Sass Library
  *
  ============================================================================ */
 // ============================================================================
@@ -68,3 +68,178 @@ $svg-plus: "{{ '/assets/svgs/plus.svg' | prepend: site.baseurl }}";
 @import "lib/marketing/components/heros";
 
 @import "lib/docs/components/docs-platform";
+
+.repoRow {
+  width: 100%;
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: start;
+}
+
+.repo, .repoList {
+  border: 1px solid #E0E0EA;
+  background: rgba(14, 105, 161, 0.03);
+  overflow: hidden; }
+  .repo .repoDescription p, .repoList .repoDescription p {
+    font-size: 14px;
+    overflow: hidden;
+    color: rgba(102, 99, 122, 0.5);
+    margin: 0px; }
+  .repo img.icon, .repoList img.icon {
+    height: 14px;
+    margin-right: 4px;
+    position: relative;
+    top: 1px; }
+
+.repo {
+  text-overflow: ellipsis;
+  min-width: 180px;
+  max-width: 320px;
+  border-radius: 4px;
+  width: 33.333333%;
+  margin-right: 0px;
+  width: calc(33.333333% - 32px);
+ }
+  .repo:nth-of-type(3n) {
+    margin-right: 0px; }
+  .repo h4 {
+    margin: 10px 0px;
+    color: #66637A;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 20px;;
+  }
+  .repo .SDKLogo {
+    height: 30px;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    margin: auto 0;
+    right: 16px; }
+  .repo .repoTitle {
+    padding: 10px 16px;
+    position: relative; }
+    .repo .repoTitle h4 {
+      transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: normal; }
+    .repo .repoTitle p {
+      margin: 0px;
+      opacity: 0.45;
+      font-size: 14px;
+      font-family: "webfont_alright";
+      line-height: 16px; }
+      .repo .repoTitle p span {
+        margin-right: 24px; }
+  .repo .repoLink {
+    height: 40px;
+    border-top: 1px solid #E0E0EA;
+    position: relative;
+    cursor: pointer;
+    background: #ffffff; }
+    .repo .repoLink a {
+      border-bottom: 1px solid #E0E0EA; }
+    .repo .repoLink:first-of-type {
+      margin-top: 0px; }
+    .repo .repoLink p {
+      line-height: 40px;
+      padding: 0px 16px;
+      color: #66637A;
+      margin: 0px; }
+    .repo .repoLink:not(.blankRepoLink):hover:after {
+      opacity: 1; }
+    .repo .repoLink:not(.blankRepoLink):after {
+      transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      width: 24px;
+      height: 24px;
+      background: url("../img/arrowRight.svg") no-repeat center;
+      background-size: 100% auto;
+      opacity: 0.18; }
+    .repo .repoLink.expandableRepoLink {
+      min-height: 40px;
+      height: auto;
+      max-height: 40px;
+      overflow: hidden;
+      transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+      .repo .repoLink.expandableRepoLink p {
+        border-bottom: 1px solid #E0E0EA; }
+      .repo .repoLink.expandableRepoLink ul {
+        padding: 12px 0px;
+        margin: 0px;
+        background: rgba(224, 224, 234, 0.2); }
+        .repo .repoLink.expandableRepoLink ul li {
+          margin-left: 16px;
+          padding-left: 12px;
+          font-size: 14px;
+          color: rgba(85, 85, 114, 0.6);
+          line-height: 24px;
+          list-style: none;
+          border-left: 1px solid #E0E0EA;
+          transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+          .repo .repoLink.expandableRepoLink ul li:hover {
+            color: #555572;
+            border-left: 1px solid #555572; }
+      .repo .repoLink.expandableRepoLink.expanded {
+        max-height: 240px; }
+        .repo .repoLink.expandableRepoLink.expanded:not(.blankRepoLink):after {
+          transform: rotate(90deg);
+          opacity: 1; }
+  .repo .repoDescription {
+    background: #ffffff;
+    border-top: 1px solid #E0E0EA;
+    height: auto;
+    text-overflow: ellipsis;
+    line-height: 24px;
+    padding: 12px 16px; }
+  .repo .repoButton {
+    padding: 14px 16px;
+    border-top: 1px solid #E0E0EA;
+    min-height: 61px; }
+    .repo .repoButton button, .repo .repoButton .button {
+      width: 100%; }
+  @media screen and (max-width: 960px) {
+    .repo {
+      width: calc(33.333333333% - 24px);
+      margin-right: calc(32px); } }
+  @media screen and (max-width: 600px) {
+    .repo {
+      float: none;
+      width: 100%;
+      margin: 0 auto 32px auto; }
+      .repo:nth-of-type(3n) {
+        margin: 0 auto 32px auto; }
+      .repo .blankRepoLink {
+        display: none; } }
+
+        button, .button {
+          font-family: "webfont_alright";
+          border-radius: 4px;
+          outline: none;
+          background: #169CEE;
+          color: #ffffff;
+          border: none;
+          margin-right: 32px;
+          font-size: 14px;
+          padding: 0px 16px;
+          height: 32px;
+          line-height: 32px;
+          transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          font-weight: 100; }
+          button.outline, .button.outline {
+            background: transparent;
+            border: 1px solid #169CEE;
+            color: #169CEE; }
+            button.outline:hover, .button.outline:hover {
+              background: #169CEE;
+              color: #ffffff; }
+          button.large, .button.large {
+            font-family: 'alrightRegular';
+            text-transform: uppercase;
+            font-size: 18px;
+            margin-right: 16px;
+            margin-top: 16px; }

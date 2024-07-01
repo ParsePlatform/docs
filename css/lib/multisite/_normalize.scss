@@ -273,10 +273,10 @@ button,
 input,
 select,
 textarea {
-    font-size: 100%; 
-    margin: 0; 
-    vertical-align: baseline; 
-    *vertical-align: middle; 
+    font-size: 100%;
+    margin: 0;
+    vertical-align: baseline;
+    *vertical-align: middle;
 }
 
 button,
@@ -295,7 +295,7 @@ input[type="reset"],
 input[type="submit"] {
     -webkit-appearance: button;
     cursor: pointer;
-    *overflow: visible; 
+    *overflow: visible;
 }
 
 button[disabled],
@@ -341,4 +341,9 @@ textarea {
 table {
     border-collapse: collapse;
     border-spacing: 0;
+}
+
+td {
+    padding-left: 12px;
+    padding-right: 12px;
 }

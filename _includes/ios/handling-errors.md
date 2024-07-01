@@ -17,7 +17,7 @@ user.signUp
 
 This will throw an `NSInternalInconsistencyException` because `signUp` was called without first setting the required properties (`username` and `password`).
 
-The second type of error is one that occurs when interacting with the Parse Cloud over the network. These errors are either related to problems connecting to the cloud or problems performing the requested operation. Let's take a look at another example:
+The second type of error is one that occurs when interacting with Parse Server over the network. These errors are either related to problems connecting to the cloud or problems performing the requested operation. Let's take a look at another example:
 
 <div class="language-toggle" markdown="1">
 ```objective_c
@@ -36,7 +36,7 @@ func getMyNote() -> Void {
 ```
 </div>
 
-In the above code, we try to fetch an object with a non-existent `objectId`. The Parse Cloud will return an error with an error code set in `code` and message in the error's `userInfo`. Here's how to handle it properly in your callback:
+In the above code, we try to fetch an object with a non-existent `objectId`. Parse Server will return an error with an error code set in `code` and message in the error's `userInfo`. Here's how to handle it properly in your callback:
 
 <div class="language-toggle" markdown="1">
 ```objective_c
@@ -58,10 +58,10 @@ func callbackForGet(result: PFObject?, error: NSError?) -> Void {
         print("Everything went fine!")
     } else {
         if let error = error {
-            if error.code == PFErrorCode.ErrorObjectNotFound.rawValue {
+            if error._code == PFErrorCode.errorObjectNotFound.rawValue {
                 print("Uh oh, we couldn't find the object!")
             } else {
-                let errorString = error.userInfo!["error"] as? NSString
+                let errorString = error._userInfo!["error"] as? NSString
                 print("Error: \(errorString)")
             }
         }
@@ -70,7 +70,7 @@ func callbackForGet(result: PFObject?, error: NSError?) -> Void {
 ```
 </div>
 
-The query might also fail because the device couldn't connect to the Parse Cloud. Here's the same callback but with a bit of extra code to handle that scenario explicitly:
+The query might also fail because the device couldn't connect to your Parse Server. Here's the same callback but with a bit of extra code to handle that scenario explicitly:
 
 <div class="language-toggle" markdown="1">
 ```objective_c
@@ -95,13 +95,13 @@ func callbackForGet(result: PFObject?, error: NSError?) -> Void {
         print("Everything went fine!")
     } else {
         if let error = error {
-            if error.code == PFErrorCode.ErrorObjectNotFound.rawValue {
+            if error._code == PFErrorCode.errorObjectNotFound.rawValue {
                 print("Uh oh, we couldn't find the object!")
                 // Now also check for connection errors:
-            } else if error.code == PFErrorCode.ErrorConnectionFailed.rawValue {
+            } else if error._code == PFErrorCode.errorConnectionFailed.rawValue {
                 print("Uh oh, we couldn't even connect to the Parse Cloud!")
             } else {
-                let errorString = error.userInfo!["error"] as? NSString
+                let errorString = error._userInfo!["error"] as? NSString
                 print("Error: \(errorString)")
             }
         }

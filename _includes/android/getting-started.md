@@ -46,11 +46,13 @@ public class App extends Application {
 }
 ```
 
- The custom `Application` class must be registered in `AndroidManifest.xml`:
- ```xml
+The custom `Application` class must be registered in `AndroidManifest.xml`:
+```xml
  <application
    android:name=".App"
    ...>
    ...
  </application>
- ```
+```
+
+Note that if you are testing with a server using `http`, you will need to add `android:usesCleartextTraffic="true"` to your above `<application>` definition, but you should only do this while testing and should use `https` for your final product.

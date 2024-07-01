@@ -16,10 +16,12 @@ However, there are a few caveats:
 * Scheduled push is not supported
 
 ## API
-We support most of the sending options similar to the hosted Parse.com service. Check the detailed doc [here]({{ site.baseUrl }}/rest/guide/#sending-options). Parse Server supports the following:
+We support most of the sending options. Check the detailed doc [here]({{ site.baseUrl }}/rest/guide/#sending-options). Parse Server supports the following:
 
 * `channels` to target installations by channels
 * `where` to target installations by `ParseQuery`
+* `priority` under `data` for iOS push priority
+* `push_type` under `data` for iOS push type
 * `alert` under `data` for notification message
 *  number `badge` under `data` for iOS badge number
 * `sound` under `data` for iOS sound
@@ -42,7 +44,7 @@ You will need to obtain some credentials from FCM and APNS in order to send push
 
 #### APNS (iOS)
 
-If you are setting up push notifications on iOS, tvOS or macOS for the first time, we recommend you visit the [raywenderlich.com's Push Notifications tutorial](https://www.raywenderlich.com/123862/push-notifications-tutorial) or [appcoda.com's iOS Push tutorial](https://www.appcoda.com/push-notification-ios/) to help you obtain a production Apple Push Certificate. Parse Server supports the PFX (`.p12`) file exported from Keychain Access. Parse Server also supports the push certificate and key in `.pem` format. Token-based authentication instead of a certificate is supported as well.
+If you are setting up push notifications on iOS, tvOS or macOS for the first time, we recommend you visit the [raywenderlich.com's Push Notifications tutorial](https://www.raywenderlich.com/11395893-push-notifications-tutorial-getting-started) or [appcoda.com's iOS Push tutorial](https://www.appcoda.com/push-notification-ios/) to help you obtain a production Apple Push Certificate. Parse Server supports the PFX (`.p12`) file exported from Keychain Access. Parse Server also supports the push certificate and key in `.pem` format. Token-based authentication instead of a certificate is supported as well.
 
 #### FCM (Android)
 
@@ -121,11 +123,17 @@ push: {
       bundleId: '',  
       production: true // Prod
     }
+  ],
+  tvos: [
+    // ...
+  ],
+  osx: [
+    // ...
   ]
 }
 ```
 
-The configuration for macOS and tvOS works exactly as for iOS. Just add an additional configuration for each plattform. Please note the key for macOS is `osx`. If you need to support both the dev and prod certificates, you can do that for all Apple plattforms like described above.
+The configuration for macOS and tvOS works exactly as for iOS. Just add an additional configuration for each platform under the appropriate key. Please note the key for macOS is `osx` and for tvOS is `tvos`. If you need to support both the dev and prod certificates, you can do that for all Apple platforms like described above.
 
 ```js
 var server = new ParseServer({
@@ -229,9 +237,32 @@ After sending this to your Parse Server, you should see the push notifications s
 
 In your Parse Server logs, you can see something similar to
 
-```js
+```jsonc
 // FCM request and response
-{"request":{"params":{"priority":"normal","data":{"time":"2016-02-10T03:21:59.065Z","push_id":"NTDgWw7kp8","data":"{\"alert\":\"All work and no play makes Jack a dull boy.\"}"}}},"response":{"multicast_id":5318039027588186000,"success":1,"failure":0,"canonical_ids":0,"results":[{"registration_id":"APA91bEdLpZnXT76vpkvkD7uWXEAgfrZgkiH_ybkzXqhaNcRw1KHOY0s9GUKNgneGxe2PqJ5Swk1-Vf852kpHAP0Mhoj5wd1MVXpRsRr_3KTQo_dkNd_5wcQ__yWnWLxbeM3kg_JziJK","message_id":"0:1455074519347821%df0f8ea7f9fd7ecd"}]}}
+{
+  "request": {
+    "params": {
+      "priority": "normal",
+      "data": {
+        "time": "2022-01-01T12:23:45.678Z",
+        "push_id": "NTDgWw7kp8",
+        "data": "{\"alert\":\"All work and no play makes Jack a dull boy.\"}"
+      }
+    }
+  },
+  "response": {
+    "multicast_id": 5318039027588186000,
+    "success": 1,
+    "failure": 0,
+    "canonical_ids": 0,
+    "results": [
+      {
+        "registration_id": "APA91bEdLpZnXT76vpkvkD7uWXEAgfrZgkiH_ybkzXqhaNcRw1KHOY0s9GUKNgneGxe2PqJ5Swk1-Vf852kpHAP0Mhoj5wd1MVXpRsRr_3KTQo_dkNd_5wcQ__yWnWLxbeM3kg_JziJK",
+        "message_id": "0:1455074519347821%df0f8ea7f9fd7ecd"
+      }
+    ]
+  }
+}
 ```
 
 ```sh
@@ -276,7 +307,9 @@ If you're interested in any of these features, [don't hesitate to jump in and se
 
 ### Silent Notifications
 
-If you have migrated from Parse.com Push and you are seeing situations where silent notifications are failing to deliver, please ensure that your payload is setting the `content-available` attribute to Int(1) and not "1". This value will be explicitly checked.
+If you are seeing situations where silent notifications are failing to deliver, please ensure that your payload is setting the `content-available` attribute to Int(1) (or just 1 as in javascript) and not "1". This value will be explicitly checked.
+
+When sending a push notification to APNs you also have to set `push_type` to `background` for delivering silent notifications to devices running iOS 13 and later, or watchOS 6 or later.
 
 ### PPNS
 

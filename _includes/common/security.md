@@ -14,7 +14,7 @@ The master key, on the other hand, is definitely a security mechanism. Using the
 
 The overall philosophy is to limit the power of your clients (using client keys), and to perform any sensitive actions requiring the master key in Cloud Code. You'll learn how to best wield this power in the section titled [Implementing Business Logic in Cloud Code](#implementing-business-logic-in-cloud-code).
 
-A final note: It is recommended to setup HTTPS and SSL in your server, to avoid man-in-the-middle attacks, but Parse works fine as well with non-HTTPS connections.  
+A final note: It is recommended to setup HTTPS and SSL in your server, to avoid man-in-the-middle attacks, but Parse works fine as well with non-HTTPS connections.
 
 ## Class-Level Permissions
 
@@ -33,6 +33,12 @@ Almost every class that you create should have these permissions tweaked to some
 ### Restricting class creation
 
 As a start, you can configure your application so that clients cannot create new classes on Parse. This is done by setting the key `allowClientClassCreation` to `false` in your ParseServer configuration.  See the project Readme for an overview of [Configuring your ParseServer](https://github.com/parse-community/parse-server#configuration).   Once restricted, classes may only be created from the Data Browser or with a the `masterKey`. This will prevent attackers from filling your database with unlimited, arbitrary new classes.
+
+### Enforcing Private Users
+
+*Requires Parse Server 5.0.0+*
+
+By default, Parse Server creates Users with public read access. This allows other users, and un-authenticated users, to read data such as `email`. When moving to production, set the key `enforcePrivateUsers` to `true`, as this will remove the public read access to new users.
 
 ### Configuring Class-Level Permissions
 
@@ -70,7 +76,7 @@ When a user logs into an app, they initiate a session with Parse. Through this s
 
 The easiest way to control who can access which data is through access control lists, commonly known as ACLs. The idea behind an ACL is that each object has a list of users and roles along with what permissions that user or role has. A user needs read permissions (or must belong to a role that has read permissions) in order to retrieve an object's data, and a user needs write permissions (or must belong to a role that has write permissions) in order to update or delete that object.
 
-Once you have a User, you can start using ACLs. Remember: Users can be created through traditional username/password signup, through a third-party login system like Facebook or Twitter, or even by using Parse's [automatic anonymous users]({{ site.baseUrl }}/ios/guide/#anonymous-users) functionality. To set an ACL on the current user's data to not be publicly readable, all you have to do is:
+Once you have a User, you can start using ACLs. Remember: Users can be created through traditional username/password sign up, through a third-party login system like Facebook or Twitter, or even by using Parse's [automatic anonymous users]({{ site.baseUrl }}/ios/guide/#anonymous-users) functionality. To set an ACL on the current user's data to not be publicly readable, all you have to do is:
 
 {% if page.language == "objective_c-swift" %}
 <div class="language-toggle" markdown="1">
@@ -79,7 +85,7 @@ PFUser *user = [PFUser currentUser];
 user.ACL = [PFACL ACLWithUser:user];
 ```
 ```swift
-if let user = PFUser.currentUser() {
+if let user = PFUser.current() {
     user.ACL = PFACL(user: user)
 }
 ```
@@ -136,7 +142,7 @@ To make it super easy to create user-private ACLs for every object, we have a wa
 [PFACL setDefaultACL:[PFACL ACL] withAccessForCurrentUser:YES];
 ```
 ```swift
-PFACL.setDefaultACL(PFACL(), withAccessForCurrentUser: true)
+PFACL.setDefault(PFACL(), withAccessForCurrentUser: true)
 ```
 </div>
 {% endif %}
@@ -189,7 +195,7 @@ privateData.ACL = [PFACL ACLWithUser:[PFUser currentUser]];
 [[PFUser currentUser] setObject:privateData forKey:@"privateData"];
 ```
 ```swift
-if let currentUser = PFUser.currentUser() {
+if let currentUser = PFUser.current() {
     let privateData = PFObject(className: "PrivateUserData")
     privateData.ACL = PFACL(user: currentUser)
     privateData.setObject("555-5309", forKey: "phoneNumber")
@@ -262,9 +268,9 @@ PFACL *acl = [PFACL ACL];
 ```
 ```swift
 let acl = PFACL()
-acl.setPublicReadAccess(true)
+acl.hasPublicReadAccess = true
 if let currentUser = PFUser.currentUser() {
-    acl.setWriteAccess(true, forUser: currentUser)
+    acl.setWriteAccess(true, for: currentUser)
 }
 ```
 </div>
@@ -314,7 +320,7 @@ $acl->setWriteAccess(ParseUser::getCurrentUser(), true);
 ```
 {% endif %}
 
-Sometimes it's inconvenient to manage permissions on a per-user basis, and you want to have groups of users who get treated the same (like a set of admins with special powers). Roles are are a special kind of object that let you create a group of users that can all be assigned to the ACL. The best thing about roles is that you can add and remove users from a role without having to update every single object that is restricted to that role. To create an object that is writeable only by admins:
+Sometimes it's inconvenient to manage permissions on a per-user basis, and you want to have groups of users who get treated the same (like a set of admins with special powers). Roles are a special kind of object that let you create a group of users that can all be assigned to the ACL. The best thing about roles is that you can add and remove users from a role without having to update every single object that is restricted to that role. To create an object that is writeable only by admins:
 
 {% if page.language == "objective_c-swift" %}
 <div class="language-toggle" markdown="1">
@@ -389,7 +395,7 @@ All this is just the beginning. Applications can enforce all sorts of complex ac
 
 For the curious, here's the format for an ACL that restricts read and write permissions to the owner (whose `objectId` is identified by `"aSaMpLeUsErId"`) and enables other users to read the object:
 
-```json
+```jsonc
 {
     "*": { "read":true },
     "aSaMpLeUsErId": { "read" :true, "write": true }
@@ -398,7 +404,7 @@ For the curious, here's the format for an ACL that restricts read and write perm
 
 And here's another example of the format of an ACL that uses a Role:
 
-```json
+```jsonc
 {
     "role:RoleName": { "read": true },
     "aSaMpLeUsErId": { "read": true, "write": true }
@@ -411,9 +417,9 @@ Pointer permissions are a special type of class-level permission that create a v
 
 Given that objects often already have pointers to the user(s) that should have permissions on the object, pointer permissions provide a simple and fast solution for securing your app using data which is already there, that doesn't require writing any client code or cloud code.
 
-Pointer permissions are like virtual ACLs. They don't appear in the ACL column, buf if you are familiar with how ACLs work, you can think of them like ACLs. In the above example with the `sender` and `receiver`, each object will act as if it has an ACL of:
+Pointer permissions are like virtual ACLs. They don't appear in the ACL column, but if you are familiar with how ACLs work, you can think of them like ACLs. In the above example with the `sender` and `receiver`, each object will act as if it has an ACL of:
 
-```json
+```jsonc
 {
     "<SENDER_USER_ID>": {
         "read": true,
@@ -516,12 +522,10 @@ One particularly common use case for Cloud Code is preventing invalid data from 
 To create validation functions, Cloud Code allows you to implement a `beforeSave` trigger for your class. These triggers are run whenever an object is saved, and allow you to modify the object or completely reject a save. For example, this is how you create a [Cloud Code beforeSave trigger]({{ site.baseUrl }}/cloudcode/guide/#beforesave-triggers) to make sure every user has an email address set:
 
 ```js
-Parse.Cloud.beforeSave(Parse.User, function(request, response) {
-  var user = request.object;
+Parse.Cloud.beforeSave(Parse.User, request => {
+  const user = request.object;
   if (!user.get("email")) {
-    response.error("Every user must have an email address.");
-  } else {
-    response.success();
+    throw "Every user must have an email address.";
   }
 });
 ```
@@ -548,21 +552,76 @@ Say you want to allow a user to "like" a `Post` object without giving them full 
 The master key should be used carefully. setting `useMasterKey` to `true` only in the individual API function calls that need that security override:
 
 ```js
-Parse.Cloud.define("like", function(request, response) {
+Parse.Cloud.define("like", async request => {
   var post = new Parse.Object("Post");
   post.id = request.params.postId;
   post.increment("likes");
-  post.save(null, { useMasterKey: true }).then(function() {
-    // If I choose to do something else here, it won't be using
-    // the master key and I'll be subject to ordinary security measures.
-    response.success();
-  }, function(error) {
-    response.error(error);
-  });
+  await post.save(null, { useMasterKey: true })
 });
 ```
 
 One very common use case for Cloud Code is sending push notifications to particular users. In general, clients can't be trusted to send push notifications directly, because they could modify the alert text, or push to people they shouldn't be able to. Your app's settings will allow you to set whether "client push" is enabled or not; we recommend that you make sure it's disabled. Instead, you should write Cloud Code functions that validate the data to be pushed and sent before sending a push.
+
+## Rate Limiting
+
+* Available on Parse Server >=6.0.0 *
+
+It's important to restrict how often a client can call the Parse Server API. This prevents malicious attacks that could:
+- overwhelm server resources by exceeding expected API traffic
+- collect large amounts of data ("data scraping")
+- repeatedly guess passwords, object IDs, installation IDs or other data ("brute force")
+
+Parse Sever offers a mechanism to enforce rate limits by setting the Parse Server option `rateLimit`, or by specifying a `rateLimit` object on a Cloud Function validator.
+
+The valid options for a rate limit are:
+
+- `requestPath`: The path of the API route to be rate limited.
+- `requestMethods`: Optional, the HTTP request methods to be rate limited.
+- `requestTimeWindow`: The window of time in milliseconds within which the number of requests set in `requestCount` can be made before the rate limit is applied.
+- `requestCount`: The number of requests that can be made per IP address within the time window set in `requestTimeWindow` before the rate limit is applied.
+- `errorResponseMessage`: The error message that should be returned in the body of the HTTP 429 response when the rate limit is hit. Default is `Too many requests.`.
+- `includeInternalRequests`: Optional, whether the rate limit will also apply to requests that are made in by Cloud Code.
+- `includeMasterKey`: Optional, whether the rate limit will also apply to requests using the `masterKey`
+- `redisUrl` Optional, the URL of the Redis server to store rate limit data.
+
+To specify a server-wide rate limit of 200 requests per 15 minute window:
+
+```js
+const parseServer = new ParseServer({
+  rateLimit: {
+    requestPath: '*',
+    requestTimeWindow: 15 * 60 * 1000,
+    requestCount: 200,
+  },
+});
+```
+
+To specify a cloud function specific rate limit of 3 request per hour:
+
+```js
+Parse.Cloud.define('someFunction', () => {
+  return 'Hello world';
+}, {
+  rateLimit: {
+    requestTimeWindow: 60 * 60 * 1000,
+    requestCount: 3,
+  }
+});
+```
+
+Rate limits can also be applied to `beforeSave` triggers to restrict how often a given class is written to:
+
+```js
+Parse.Cloud.beforeSave('TestObject', () => {}, {
+  rateLimit: {
+    requestTimeWindow: 1 * 60 * 1000 // one write per minute,,
+    requestCount: 1,
+    errorResponseMessage: 'Too many requests!',
+  },
+});
+```
+
+> ⚠️ Rate limits should be enforced as far away from Parse Server as possible to mitigate possible impacts on resource costs, availability and integrity. While Parse Server offers a rate limiting mechanism as a conveniently available security feature without requiring a deep level of expertise, it is *not considered best practice* to enforce rate limits only after requests already reached the server. For better protection we advice to examine your network architecture an consider enforcing rate limits on the outer edge of the cloud if using a content delivery network, or at least before requests reach the server resource. Consult your cloud service provider for recommended rate limit and firewall solutions for your resources.
 
 ## Parse Security Summary
 
@@ -572,4 +631,4 @@ It is worth repeating that that the Parse User object is readable by all other u
 
 Most classes in your app will fall into one of a couple of easy-to-secure categories. For fully public data, you can use class-level permissions to lock down the table to put publicly readable and writeable by no one. For fully private data, you can use ACLs to make sure that only the user who owns the data can read it. But occasionally, you'll run into situations where you don't want data that’s fully public or fully private. For example, you may have a social app, where you have data for a user that should be readable only to friends whom they’ve approved. For this you'll need to a combination of the techniques discussed in this guide to enable exactly the sharing rules you desire.
 
-We hope that you'll use these tools to do everything you can   to keep your app's data and your users' data secure.   Together, we can make the web a safer place.
+We hope that you'll use these tools to do everything you can to keep your app's data and your users' data secure. Together, we can make the web a safer place.

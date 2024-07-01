@@ -2,7 +2,7 @@
 
 ## Creating a ParseFile
 
-`ParseFile` lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `ParseObject`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data (up to 10 megabytes).
+`ParseFile` lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `ParseObject`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data.
 
 Getting started with `ParseFile` is easy. There are a couple of ways to create a file. The first is to provide the contents of the file.
 

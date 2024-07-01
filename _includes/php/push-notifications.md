@@ -31,7 +31,7 @@ This class has several special fields that help you manage and target devices.
 
 There are two ways to send push notifications using Parse: [channels](#using-channels) and [advanced targeting]({{ site.baseUrl }}/php/guide/#using-advanced-targeting). Channels offer a simple and easy to use model for sending pushes, while advanced targeting offers a more powerful and flexible model. Both are fully compatible with each other and will be covered in this section.
 
-You can view your past push notifications on the Parse.com push console for up to 30 days after creating your push.  For pushes scheduled in the future, you can delete the push on the web console as long as no sends have happened yet. After you send the push, the web console shows push analytics graphs.
+You can view your past push notifications on the Parse Dashboard push console for up to 30 days after creating your push. For pushes scheduled in the future, you can delete the push on the web console as long as no sends have happened yet. After you send the push, the web console shows push analytics graphs.
 
 ### Using Channels
 
@@ -288,27 +288,27 @@ if(ParsePush::hasStatus($response)) {
 
     // Retrieve PushStatus object
     $pushStatus = ParsePush::getStatus($response);
-    
+
     // get push status string
     $status = $pushStatus->getPushStatus();
-    
+
     if($status == "succeeded") {
         // handle a successful push request
-        
+
     } else if($status == "running") {
         // handle a running push request
-    
+
     } else {
         // push request did not succeed
-        
+
     }
-        
+
     // get # pushes sent
     $sent = $pushStatus->getPushesSent();
-    
+
     // get # pushes failed
     $failed = $pushStatus->getPushesFailed();
-    
+
 }
 ```
 

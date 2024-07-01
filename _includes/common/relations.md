@@ -1413,7 +1413,7 @@ IEnumerable<ParseObject> books= await bookQuery.FindAsync();
 {% if page.language == "js" %}
 ```js
 // set up our query for the Book object
-cosnt bookQuery = new Parse.Query("Book");
+const bookQuery = new Parse.Query("Book");
 
 // configure any constraints on your query...
 // tell the query to fetch all of the Author objects along with the Book
@@ -1614,6 +1614,6 @@ const books = await bookQuery.find();
 In Parse, a one-to-one relationship is great for situations where you need to split one object into two objects. These situations should be rare, but two examples include:
 
 * **Limiting visibility of some user data.** In this scenario, you would split the object in two, where one portion of the object contains data that is visible to other users, while the related object contains data that is private to the original user (and protected via ACLs).
-* **Splitting up an object for size.** In this scenario, your original object is greater than the 128K maximum size permitted for an object, so you decide to create a secondary object to house extra data. It is usually better to design your data model to avoid objects this large, rather than splitting them up. If you can't avoid doing so, you can also consider storing large data in a Parse File.
+* **Splitting up an object for size.** In this scenario, your original object size is too large, so you decide to create a secondary object to house extra data. It is usually better to design your data model to avoid objects this large, rather than splitting them up. If you can't avoid doing so, you can also consider storing large data in a Parse File.
 
 Thank you for reading this far. We apologize for the complexity. Modeling relationships in data is a hard subject, in general. But look on the bright side: it's still easier than relationships with people.

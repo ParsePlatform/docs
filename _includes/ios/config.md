@@ -108,7 +108,7 @@ if date == nil ||
 *   NSString
 *   NSNumber
 *   NSDate
-*   PFFile
+*   PFFileObject
 *   PFGeoPoint
 *   NSArray
 *   NSDictionary

@@ -8,7 +8,7 @@ Note that the Parse PHP SDK requires PHP 5.4 or newer. It can also run on HHVM (
 [Get Composer], the PHP package manager. Then create a composer.json file in
  your projects root folder, containing:
 
-```json
+```jsonc
 {
     "require": {
         "parse/php-sdk" : "1.4.*"

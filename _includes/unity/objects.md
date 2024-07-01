@@ -6,7 +6,7 @@ Storing data on Parse is built around the `ParseObject`. Each `ParseObject` cont
 
 For example, let's say you're tracking high scores for a game. A single `ParseObject` could contain:
 
-```json
+```jsonc
 score: 1337, playerName: "Sean Plott", cheatMode: false
 ```
 
@@ -27,9 +27,15 @@ Task saveTask = gameScore.SaveAsync();
 
 After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at the Data Browser in your app on Parse. You should see something like this:
 
-```js
-objectId: "xWMyZ4YEGZ", score: 1337, playerName: "Sean Plott", cheatMode: false,
-createdAt:"2011-06-10T18:33:42Z", updatedAt:"2011-06-10T18:33:42Z"
+```jsonc
+{
+  "objectId": "xWMyZ4YEGZ",
+  "score": 1337,
+  "playerName": "Sean Plott",
+  "cheatMode": false,
+  "createdAt":"2022-01-01T12:23:45.678Z",
+  "updatedAt":"2022-01-01T12:23:45.678Z"
+}
 ```
 
 There are two things to note here. You didn't have to configure or set up a new Class called `GameScore` before running this code. Your Parse app lazily creates this Class for you when it first encounters it.
@@ -74,7 +80,7 @@ bigObject["myDictionary"] = dictionary;
 Task saveTask = bigObject.SaveAsync();
 ```
 
-We do not recommend storing large pieces of binary data like images or documents on `ParseObject`. `ParseObject`s should not exceed 128 kilobytes in size. We recommend you use `ParseFile`s to store images, documents, and other types of files. You can do so by instantiating a `ParseFile` object and setting it on a field. See [Files](#files) for more details.
+We do not recommend storing large pieces of binary data like images or documents on `ParseObject`. We recommend you use `ParseFile`s to store images, documents, and other types of files. You can do so by instantiating a `ParseFile` object and setting it on a field. See [Files](#files) for more details.
 
 For more information about how Parse handles data, check out our documentation on [Data](#data).
 

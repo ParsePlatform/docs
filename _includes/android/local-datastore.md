@@ -17,6 +17,16 @@ public class App extends Application {
 }
 ```
 
+If you use a `Parse.Configuration.Builder`, enable it there instead:
+
+```java
+Parse.initialize(new Parse.Configuration.Builder(context)
+  .server(...)
+  .applicationId(...)
+  .enableLocalDataStore()
+  .build());
+```
+
 There are a couple of side effects of enabling the local datastore that you should be aware of. When enabled, there will only be one instance of any given `ParseObject`. For example, imagine you have an instance of the `"GameScore"` class with an `objectId` of `"xWMyZ4YEGZ"`, and then you issue a `ParseQuery` for all instances of `"GameScore"` with that `objectId`. The result will be the same instance of the object you already have in memory.
 
 Another side effect is that the current user and current installation will be stored in the local datastore, so you can persist unsaved changes to these objects between runs of your app using the methods below.

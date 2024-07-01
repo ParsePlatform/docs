@@ -5,7 +5,7 @@ layout: guide
 platform: php
 language: php
 display_platform: PHP
-api_reference: https://parse-community.github.io/parse-php-sdk/namespaces/Parse.html
+api_reference: https://parse-community.github.io/parse-php-sdk/
 
 sections:
 - "php/getting-started.md"

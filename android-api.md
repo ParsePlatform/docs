@@ -3,5 +3,5 @@ layout: redirected
 sitemap: false
 permalink: /android/api/
 redirect_to:
-  - {{ site.apis.android }}
+  - https://parseplatform.org/Parse-SDK-Android/api/
 ---

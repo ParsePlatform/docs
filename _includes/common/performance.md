@@ -580,7 +580,7 @@ You should avoid using regular expression constraints that don't use indexes. Fo
 
 {% if page.language == "js" %}
 ```javascript
-query.matches("playerName", "Michael", “i”);
+query.matches("playerName", "Michael", "i");
 ```
 {% endif %}
 
@@ -1033,19 +1033,15 @@ You can use this to offload processing to the Parse servers thus increasing your
 We saw examples of limiting the data returned by writing restrictive queries. You can also use [Cloud Functions]({{ site.baseUrl }}/cloudcode/guide/#cloud-functions) to help limit the amount of data returned to your app. In the following example, we use a Cloud Function to get a movie's average rating:
 
 ```javascript
-Parse.Cloud.define("averageStars", function(request, response) {
-  var Review = Parse.Object.extend("Review");
-  var query = new Parse.Query(Review);
+Parse.Cloud.define("averageStars", async (request) => {
+  const query = new Parse.Query("Review");
   query.equalTo("movie", request.params.movie);
-  query.find().then(function(results) {
-    var sum = 0;
-    for (var i = 0; i < results.length; ++i) {
-      sum += results[i].get("stars");
-    }
-    response.success(sum / results.length);
-  }, function(error) {
-    response.error("movie lookup failed");
-  });
+  const results = await query.find();
+  let sum = 0;
+  for (let i = 0; i < results.length; ++i) {
+    sum += results[i].get("stars");
+  }
+  return sum / results.length;
 });
 ```
 
@@ -1143,7 +1139,7 @@ Suppose you are displaying movie information in your app and your data model con
 ```javascript
 var Review = Parse.Object.extend("Review");
 var query = new Parse.Query("Review");
-query.equalTo(“movie”, movie);
+query.equalTo("movie", movie);
 query.count().then(function(count) {
   // Request succeeded
 });
@@ -1333,7 +1329,7 @@ Let's walk through an example of how you could build an efficient search. You ca
 
 ```javascript
 var _ = require("underscore");
-Parse.Cloud.beforeSave("Post", function(request, response) {
+Parse.Cloud.beforeSave("Post", request => {
   var post = request.object;
   var toLowerCase = function(w) { return w.toLowerCase(); };
   var words = post.get("text").split(/\b/);
@@ -1346,7 +1342,6 @@ Parse.Cloud.beforeSave("Post", function(request, response) {
   hashtags = _.map(hashtags, toLowerCase);
   post.set("words", words);
   post.set("hashtags", hashtags);
-  response.success();
 });
 ```
 
@@ -1358,7 +1353,7 @@ Once you've got the keywords set up, you can efficiently look them up using “A
 ```javascript
 var Post = Parse.Object.extend("Post");
 var query = new Parse.Query(Post);
-query.containsAll("hashtags", [“#parse”, “#ftw”]);
+query.containsAll("hashtags", ["#parse", "#ftw"]);
 query.find().then(function(results) {
   // Request succeeded
 }, function(error) {
@@ -1430,7 +1425,7 @@ var results = await ParseObject.GetQuery("Post")
 ```php
 $query = new ParseQuery("Post");
 
-$query->containsAll("hashtags", [“#parse”, “#ftw”]);
+$query->containsAll("hashtags", ["#parse", "#ftw"]);
 
 $posts = $query->find();
 // posts containing all the given hash tags
@@ -1442,8 +1437,7 @@ $posts = $query->find();
 There are some limits in place to ensure the API can provide the data you need in a performant manner. We may adjust these in the future. Please take a moment to read through the following list:
 
 **Objects**
-
-* Parse Objects are limited in size to 128 KB.
+* We recommend against storing large pieces of binary data like images or documents in a Parse Object.
 * We recommend against creating more than 64 fields on a single Parse Object to ensure that we can build effective indexes for your queries.
 * We recommend against using field names that are longer than 1,024 characters, otherwise an index for the field will not be created.
 
