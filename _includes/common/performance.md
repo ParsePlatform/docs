@@ -999,31 +999,6 @@ $results = $query->find();
 
 For queries run from iOS and Android, you can turn on query caching. See the [iOS]({{ site.baseUrl }}/ios/guide/#caching-queries) and [Android]({{ site.baseUrl }}/android/guide/#caching-queries) guides for more details. Caching queries will increase your mobile app's performance especially in cases where you want to display cached data while fetching the latest data from Parse.
 
-{% if page.language == "js" %}
-
-Under the hood, each object field is constructed from two pieces of data: the last-known server value, and any local changes that have not been saved yet. If you `.get()` the attribute value, it will calculate the response by applying the unsaved change to the server data.
-
-If you called `.set()` on a field but did not save it, then calling `.get()` will always return your unsaved value, regardless of how the server data changes underneath.
-
-If this is not a desired behaviour, use `.revert()` to clear unsaved changes applied to the object.
-
-`.revert()` clears any changes to this object made since the last call to save()
-
-```javascript
-var GameScore = Parse.Object.extend("GameScore");
-var query = new Parse.Query(GameScore);
-query.find().then(function(results) {
-  // Retrieved scores successfully
-  results.forEach(function(result){
-    result.revert() //clear all unsaved cchnges
-  })
-});
-```
-{% endif %}
-
-
-
-
 ## Use Cloud Code
 
 Cloud Code allows you to run custom JavaScript logic on Parse Server instead of on the client.

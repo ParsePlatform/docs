@@ -570,6 +570,34 @@ query.distinct("age")
   });
 ```
 
+## Local vs. Server Data
+
+The value of a Parse Object field is determined from two data sources: the last-known value sent by the server, and any local changes made via `.set()` that have not been saved and sent to the server yet. When calling `.get()` on a field, the returned value will be the unsaved local value, or if no change has been made, the last-known value sent by the server.
+
+If you called `.set()` on a field but did not save it, then calling `.get()` will always return the unsaved value, regardless of how the value changed on the server side.
+
+If this is not a desired behavior, use `.revert()` to clear and unsaved local changes applied to the object.
+
+```javascript
+// Save object
+const GameScore = Parse.Object.extend("GameScore");
+const localObject = new Parse.Object(GameScore);
+localObject.set('field', 'a');
+await localObject.save();
+
+// Modify object locally without saving it
+localObject.set('field', 'b');
+
+// Fetch local object from server
+const query = new Parse.Query(GameScore);
+const fetchedObject = await query.first();
+
+// Determine field value
+fetchedObject.get('field'); // Returns value 'b'
+fetchedObject.revert();
+fetchedObject.get('field'); // Returns value 'a'
+```
+
 ## Read Preference
 
 When using a MongoDB replica set, you can use the `query.readPreference(readPreference, includeReadPreference, subqueryReadPreference)` function to choose from which replica the objects will be retrieved. The `includeReadPreference` argument chooses from which replica the included pointers will be retrieved and the `subqueryReadPreference` argument chooses in which replica the subqueries will run. The possible values are `PRIMARY` (default), `PRIMARY_PREFERRED`, `SECONDARY`, `SECONDARY_PREFERRED`, or `NEAREST`. If the `includeReadPreference` argument is not passed, the same replica chosen for `readPreference` will be also used for the includes. The same rule applies for the `subqueryReadPreference` argument.
