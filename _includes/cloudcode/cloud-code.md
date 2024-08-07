@@ -104,7 +104,7 @@ const ratings = await Parse.Cloud.run("averageStars", params);
 // ratings should be 4.5
 ```
 
-In general, three arguments will be passed into cloud functions:
+In general, these arguments will be passed into Cloud Functions:
 
 1.  **`request`** - The request object contains information about the request. The following fields are set:
   1.  **`params`** - The parameters object sent to the function by the client.
