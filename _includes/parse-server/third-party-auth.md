@@ -27,17 +27,21 @@ Parse Server supports 3rd party authentication with
 * Weibo
 
 Configuration options for these 3rd-party modules is done with the `auth` option passed to Parse Server:
+In addition to configuring third-party modules with the auth option passed to Parse Server, there is a general option available to control the security level of third-party authentication. By default, the authentication process is secure (`enableInsecureAuthAdapters: false`). This means that third-party authentication is performed in a secure manner. However, if you prefer to use the insecure method, you can set `enableInsecureAuthAdapters: true`, and there is a specific option for each third-party module to enable insecure authentication (`enableInsecureAuth: true`) which is disabled by default as well.
 
 ```js
 {
+  enableInsecureAuthAdapters: true, // OPTIONAL
   auth: {
    twitter: {
      consumer_key: "", // REQUIRED
-     consumer_secret: "" // REQUIRED
+     consumer_secret: "", // REQUIRED
+     enableInsecureAuth: true // OPTIONAL
    },
    facebook: {
-     appIds: "FACEBOOK APP ID"
-   }
+     appIds: "FACEBOOK APP ID",
+     enableInsecureAuth: true // OPTIONAL
+   },
   }
 }
 ```
@@ -157,6 +161,15 @@ Learn more about [Sign In With Apple](https://developer.okta.com/blog/2019/06/04
 ### Github `authData`
 
 ```jsonc
+// Secure authentication
+{
+  "github": {
+    "code": "a temporary authorization code from Github",
+  }
+}
+
+
+// Insecure authentication
 {
   "github": {
     "id": "user's Github id (string)",
