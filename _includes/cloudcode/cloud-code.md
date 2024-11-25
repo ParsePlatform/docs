@@ -757,15 +757,36 @@ Parse.LiveQuery.on('error', (error) => {
 
 *Available only on parse-server cloud code starting 4.3.0*
 
-In some cases you may want to transform the incoming subscription query. Examples include adding an additional limit, increasing the default limit, adding extra includes or restricting the results to a subset of keys. You can do so with the `beforeSubscribe` trigger. 
+In some cases you may want to transform the incoming subscription query. Examples include adding an additional limit, increasing the default limit, adding extra includes or restricting the results to a subset of keys. You can do so with the `beforeSubscribe` trigger.
 
 ```javascript
 Parse.Cloud.beforeSubscribe('MyObject', request => {
-    if (!request.user.get('Admin')) {
-        throw new Parse.Error(101, 'You are not authorized to subscribe to MyObject.');
-    }
-    let query = request.query; // the Parse.Query
-    query.select("name","year")
+  if (!request.user.get('Admin')) {
+    throw new Parse.Error(101, 'You are not authorized to subscribe to MyObject.');
+  }
+  let query = request.query; // the Parse.Query
+  query.select("name","year")
+});
+```
+
+
+## beforeUnsubscribe
+
+*Available only on parse-server cloud code starting 5.0.0*
+
+In some cases you may want to stop an action initiated in the `beforeSubscribe` trigger. 
+
+```javascript
+const liveQueries = {}
+Parse.Cloud.beforeSubscribe('MyObject', request => {
+  liveQueries[request.requestId] = setInterval(() => { console.log(`Hello from ${request.requestId}`)})
+});
+
+Parse.Cloud.beforeUnsubscribe('MyObject', request => {
+  if (liveQueries[request.requestId]) {
+    clearInterval(liveQueries[request.requestId])
+    liveQueries[request.requestId] = null
+  }
 });
 ```
 
