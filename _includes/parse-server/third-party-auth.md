@@ -418,3 +418,40 @@ For more information about custom auth please see the examples:
 - [Twitter OAuth](https://github.com/parse-community/parse-server/blob/master/src/Adapters/Auth/twitter.js)
 - [Instagram OAuth](https://github.com/parse-community/parse-server/blob/master/src/Adapters/Auth/instagram.js)
 - [Microsoft Graph OAuth](https://github.com/parse-community/parse-server/blob/master/src/Adapters/Auth/microsoft.js)
+
+## External Authentication
+
+It is also possible to use a completely external, JWT-based authentication mechanism. 
+
+Simply inject middleware before Parse Server:
+
+```js
+const authenticateUser = (req, res, next) => {
+
+	const jwtPayload = verifyJwt(token);
+
+	req.userFromJWT = new Parse.User({
+		objectId: jwtPayload.parseUserId,
+		role: jwtPayload.parseRole,
+		username: jwtPayload.parseUserName,
+		department: jwtPayload.parseDepartment,
+		email: jwtPayload.email
+	});
+
+	return next();
+};
+
+Application.use('/parse', authenticateUser, new ParseServer({...}));
+```
+
+Clients can leverage this new functionality with trivial changes.
+
+```js
+// This included our tokens in the 'Authorization' header as a bearer token
+Parse.serverAuthType = 'Bearer';
+Parse.serverAuthToken = `${getJwt()}`;
+
+// No no longer any need for user password,
+// because authentication is provided by bearer token
+Parse.User.logIn(username, '').then(parseUser => ...);
+```
