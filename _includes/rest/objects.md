@@ -102,6 +102,8 @@ The response body is a JSON object containing the `objectId` and the `createdAt`
 }
 ```
 
+The response body also includes any field that was modified using `beforeSave` and `afterSave` triggers.
+
 ## Retrieving Objects
 
 Once you've created an object, you can retrieve its contents by sending a GET request to the object URL returned in the location header. For example, to retrieve the object we created above:
@@ -240,13 +242,15 @@ print(result)
 </code></pre>
 </div>
 
-The response body is a JSON object containing just an `updatedAt` field with the timestamp of the update.
+The response body is a JSON object containing, by default, an `updatedAt` field with the timestamp of the update.
 
 ```jsonc
 {
   "updatedAt": "2022-01-01T12:23:45.678Z"
 }
 ```
+
+The response body also includes any field that was modified using `beforeSave` and `afterSave` triggers.
 
 ### Counters
 
