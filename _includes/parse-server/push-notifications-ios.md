@@ -56,7 +56,7 @@ func application(application: UIApplication, didFailToRegisterForRemoteNotificat
 }
 
 func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-    PFPush.handlePush(userInfo)
+    PFPush.handle(userInfo)
 }
 ```
 

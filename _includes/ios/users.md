@@ -360,7 +360,7 @@ To help ensure that your users' data is secure by default, you can set a default
 [PFACL setDefaultACL:defaultACL withAccessForCurrentUser:YES];
 ```
 ```swift
-PFACL.setDefaultACL(defaultACL, withAccessForCurrentUser:true)
+PFACL.setDefault(defaultACL, withAccessForCurrentUser:true)
 ```
 </div>
 
@@ -377,7 +377,7 @@ PFACL *defaultACL = [PFACL ACL];
 ```swift
 var defaultACL = PFACL.ACL()
 defaultACL.setPublicReadAccess(true)
-PFACL.setDefaultACL(defaultACL, withAccessForCurrentUser:true)
+PFACL.setDefault(defaultACL, withAccessForCurrentUser:true)
 ```
 </div>
 
@@ -388,7 +388,7 @@ For an app like Dropbox, where a user's data is only accessible by the user itse
 [PFACL setDefaultACL:[PFACL ACL] withAccessForCurrentUser:YES];
 ```
 ```swift
-PFACL.setDefaultACL(PFACL.ACL(), withAccessForCurrentUser:true)
+PFACL.setDefault(PFACL.ACL(), withAccessForCurrentUser:true)
 ```
 </div>
 
@@ -399,7 +399,7 @@ For an application that logs data to Parse but doesn't provide any user access t
 [PFACL setDefaultACL:[PFACL ACL] withAccessForCurrentUser:NO];
 ```
 ```swift
-PFACL.setDefaultACL(PFACL.ACL(), withAccessForCurrentUser:false)
+PFACL.setDefault(PFACL.ACL(), withAccessForCurrentUser:false)
 ```
 </div>
 
