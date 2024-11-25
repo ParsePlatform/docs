@@ -42,7 +42,9 @@ const ParseServer = require('parse-server').ParseServer;
 
 const app = express();
 const api = new ParseServer({ ... });
-await api.start();
+(async() => {
+  await api.start();
+})();
 
 // Serve the Parse API at /parse URL prefix
 app.use('/parse', api.app);
