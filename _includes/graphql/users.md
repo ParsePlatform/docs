@@ -245,7 +245,9 @@ mutation logOut {
 
 ## Resetting Passwords
 
-To use the `resetPassword` mutation your Parse Server must have an email adapter configured.
+To use the `resetPassword` mutation your Parse Server must have an [email adapter configured as described in the Parse Server guide](https://docs.parseplatform.org/parse-server/guide/#welcome-emails-and-email-verification).
+
+When configured, this mutation will send an email with a password reset link.
 
 ```jsonc
 // Header
@@ -272,9 +274,84 @@ mutation resetPassword {
 }
 ```
 
+The emailed password reset link will GET the Parse REST API to verify the token is still valid.  For example:
+```
+https://www.example.com/parse/apps/APP_ID/request_password_reset?token=xxxxxxxxxxxx&username=test%40example.com
+```
+Parse will then forward the user's browser to a password reset page provided (or invalid token page) by the Parse server itself.
+
+Optionally, the Parse server can be configured to forward to a custom page with-in your web application.  This is done using the ["customPages" feature](https://parseplatform.org/parse-server/api/master/CustomPagesOptions.html).  For example, using Express:
+```
+const parseServer = new ParseServer({
+  // Basics: https://github.com/parse-community/parse-server#basic-options
+   appId: process.env.PARSE_SERVER_APPLICATION_ID,
+  ...otherOptions
+
+  // Email: https://github.com/parse-community/parse-server#email-verification-and-password-reset
+  verifyUserEmails: true,
+  emailVerifyTokenValidityDuration: 2 * weekInSeconds,
+  preventLoginWithUnverifiedEmail: false,
+
+  // Emailed links point to this host.  It must include `/parse`
+  publicServerURL: process.env.PARSE_PUBLIC_SERVER_URL || process.env.PARSE_SERVER_URL,
+  // Your apps name. This will appear in the subject and body of the emails that are sent.
+  appName: 'Application Name for User',
+  // The email adapter
+  emailAdapter: {
+    module: "parse-server-aws-ses",
+    options: {
+      from: `Hello <${process.env.EMAIL_FROM_ADDRESS}>`,
+      region: process.env.AWS_REGION,
+      // aws-sdk loads keys from environment variables
+    }
+  },
+
+  customPages: {
+    invalidLink: `${process.env.APP_PUBLIC_URL}/auth/invalid-link`,
+    
+    verifyEmailSuccess: `${process.env.APP_PUBLIC_URL}/auth/verified`,
+
+    choosePassword: `${process.env.APP_PUBLIC_URL}/auth/reset-password`,
+    passwordResetSuccess: `${process.env.APP_PUBLIC_URL}/auth/password-saved`,
+  },
+  
+  // account lockout policy setting (OPTIONAL) - defaults to undefined
+  accountLockout: {
+    duration: 5, // minutes that a locked-out account remains locked out before becoming unlocked. Set it to a value greater than 0 and less than 100000.
+    threshold: 3, // failed sign-in attempts that will cause a user account to be locked. Set it to an integer value greater than 0 and less than 1000.
+  },
+})
+
+...
+
+// (Required) Mounts the REST API used in email verification/password reset links.
+app.use('/parse', parseServer.app);
+
+```
+
+The Parse server forwards the browser to: `choosePassword: \`${process.env.APP_PUBLIC_URL}/auth/reset-password\`,` where your web application accepts the user's new password, and crafts a response to the server.  For example, using the $axios http library.
+
+```
+  async resetPassword({ axiosClient, email, password, token }) {
+    // Make the request
+    await axiosClient.post(
+      `/parse/apps/${process.env.PARSE_SERVER_APPLICATION_ID}/request_password_reset`,
+      `username=${encodeURIComponent(email)}&new_password=${encodeURIComponent(password)}&token=${encodeURIComponent(token)}`,
+      {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'content-type': 'application/x-www-form-urlencoded',
+        }
+      }
+    )
+  },
+```
+
 ## Send Email Verification
 
-The verification email is automatically sent on sign up; this mutation is useful if the user didn't receive the first email. Again, an email adapter must be configured for this mutation to work.
+To use the `sendVerificationEmail` mutation your Parse Server must have an [email adapter configured as described in the Parse Server guide](https://docs.parseplatform.org/parse-server/guide/#welcome-emails-and-email-verification).
+
+When configured, Parse server will automatically send emails on sign up.  this mutation will re-send an email with a password reset link if the user didn't receive the first email or the token expired.
 
 ```jsonc
 // Header
@@ -301,3 +378,12 @@ mutation sendVerificationEmail {
   }
 }
 ```
+
+The emailed verification link will GET the Parse REST API to verify the token is still valid.  For example:
+```
+https://www.example.com/parse/apps/APP_ID/verify_email?token=xxxxxxxxxxxx&username=test%4example.com
+```
+
+Parse will then process the token and forward the user's browser to verified or invalid page provided by the Parse server itself.
+
+Optionally, the Parse server can be configured to forward to custom pages with-in your web application: `verifyEmailSuccess` or `customPages.invalidLink`.  Please see the "Resetting Passwords" section for an example and links to further documentation.
