@@ -1,11 +1,11 @@
 # Push Notifications
 
-Parse Server provides basic push notification functionality for iOS, macOS, tvOS and Android. With this feature, you can:
+Parse Server provides basic push notification functionality for iOS, macOS, tvOS, watchOS, and Android. With this feature, you can:
 
 * Target installations by platform
 * Target installations by a `ParseQuery`
 * Send push notifications to Android devices through [Firebase Cloud Messaging (FCM)](https://firebase.google.com/docs/cloud-messaging/)
-* Send push notifications to iOS, tvOS and macOS devices through [Apple Push Notification Service (APNS)](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1)
+* Send push notifications to iOS, tvOS, watchOS, and macOS devices through [Apple Push Notification Service (APNS)](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1)
 * Use most of the sending options
 
 However, there are a few caveats:
@@ -44,7 +44,7 @@ You will need to obtain some credentials from FCM and APNS in order to send push
 
 #### APNS (iOS)
 
-If you are setting up push notifications on iOS, tvOS or macOS for the first time, we recommend you visit the [raywenderlich.com's Push Notifications tutorial](https://www.raywenderlich.com/11395893-push-notifications-tutorial-getting-started) or [appcoda.com's iOS Push tutorial](https://www.appcoda.com/push-notification-ios/) to help you obtain a production Apple Push Certificate. Parse Server supports the PFX (`.p12`) file exported from Keychain Access. Parse Server also supports the push certificate and key in `.pem` format. Token-based authentication instead of a certificate is supported as well.
+If you are setting up push notifications on iOS, tvOS, watchOS, or macOS for the first time, we recommend you visit the [raywenderlich.com's Push Notifications tutorial](https://www.raywenderlich.com/11395893-push-notifications-tutorial-getting-started) or [appcoda.com's iOS Push tutorial](https://www.appcoda.com/push-notification-ios/) to help you obtain a production Apple Push Certificate. Parse Server supports the PFX (`.p12`) file exported from Keychain Access. Parse Server also supports the push certificate and key in `.pem` format. Token-based authentication instead of a certificate is supported as well.
 
 #### FCM (Android)
 
@@ -127,13 +127,16 @@ push: {
   tvos: [
     // ...
   ],
+  watchos: [
+    // ...
+  ],
   osx: [
     // ...
   ]
 }
 ```
 
-The configuration for macOS and tvOS works exactly as for iOS. Just add an additional configuration for each platform under the appropriate key. Please note the key for macOS is `osx` and for tvOS is `tvos`. If you need to support both the dev and prod certificates, you can do that for all Apple platforms like described above.
+The configuration for macOS, tvOS, and watchOS works exactly as for iOS. Just add an additional configuration for each platform under the appropriate key. Please note the key for macOS is `osx`, the key for tvOS is `tvos`, and the key for watchOS is `watchos`. If you need to support both the dev and prod certificates, you can do that for all Apple platforms like described above.
 
 ```js
 var server = new ParseServer({
@@ -158,6 +161,12 @@ var server = new ParseServer({
       production: false
     },
     tvos: {
+      pfx: '/file/path/to/XXX.p12',
+      passphrase: '', // optional password to your p12/PFX
+      bundleId: '',
+      production: false
+    },
+    watchos: {
       pfx: '/file/path/to/XXX.p12',
       passphrase: '', // optional password to your p12/PFX
       bundleId: '',
