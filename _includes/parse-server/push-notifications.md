@@ -1,6 +1,6 @@
 # Push Notifications
 
-Parse Server provides basic push notification functionality for iOS, macOS, tvOS, watchOS, and Android. With this feature, you can:
+Parse Server provides basic push notification functionality for iOS, macOS, tvOS, watchOS<sup>*</sup>, and Android. With this feature, you can:
 
 * Target installations by platform
 * Target installations by a `ParseQuery`
@@ -14,6 +14,8 @@ However, there are a few caveats:
 * Client push is not supported. You can only use `masterKey` to send push notifications
 * Delivery reports are not supported
 * Scheduled push is not supported
+
+<sup>*</sup>Sending notifications to watchOS devices requires [parse-server-push-adapter](https://github.com/parse-community/parse-server-push-adapter) >= 6.10.0.
 
 ## API
 We support most of the sending options. Check the detailed doc [here]({{ site.baseUrl }}/rest/guide/#sending-options). Parse Server supports the following:
